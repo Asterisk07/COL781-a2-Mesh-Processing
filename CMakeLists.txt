@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
 
 project(a2)
-set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20) #Needed to used span
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 find_package(glm REQUIRED)
 find_package(OpenGL REQUIRED)
