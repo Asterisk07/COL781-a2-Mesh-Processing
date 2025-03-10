@@ -19,6 +19,7 @@ using EdgeMap = std::unordered_map<Key, int>;
 
 using Face = std::vector<int>;
 using IntList = std::vector<int>;
+using FaceList = std::vector<Face>;
 
 using Vec3 = glm::vec3;
 using IVec3 = glm::ivec3;
@@ -29,9 +30,13 @@ using HalfEdge = std::array<int, 4>;
 using Vec3List = std::vector<Vec3>;
 using Vec3Span = std::span<Vec3>;
 using IVec3List = std::vector<IVec3>;
+// using IVec3Array = IVec3[];
 using EdgeList = std::vector<Edge>;
+using EdgeSpan = std::span<Edge>;
 using VecList = std::vector<Vec>;
 using HalfEdgeList = std::vector<HalfEdge>;
+
+using IVec3Span = std::span<IVec3>;
 
 class MeshHalfEdge
 {
@@ -49,11 +54,12 @@ public:
     EdgeMap halfedgeMap;        // Edge lookup table
     IVec3List triangleVertices; // Explicit triangle indices for rendering
     EdgeList edges;             // Explicit triangle edges for rendering
-    VecList faceVertices;       // Explicit face indices for rendering
+    // EdgeSpan edges;             // Explicit triangle edges for rendering
+    VecList faceVertices; // Explicit face indices for rendering
 
     // part1
     void addFace(const Face &face);
-    void buildHalfEdgeStructure(IVec3List &triangles);
+    void buildHalfEdgeStructure(IVec3Span triangles);
     void triangulateFace(int faceIdx);
 
     // void  resize(int n);

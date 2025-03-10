@@ -1,5 +1,14 @@
 #include "mesh.hpp" // ✅ Always include the corresponding header
 
+// A unit square in the xy-plane, divided into a grid of m rows and n columns. Each grid cell will be a 1/m × 1/n rectangle, for a total of (m+1)(n+1) vertices and mn quad faces.
+// void generateGridMesh(int m, int n) {
+
+// };
+
+// void loadObjfile(){
+
+// }
+
 // Base case for recursion: print the last argument
 template <typename T>
 void print(const T &last)
@@ -97,7 +106,7 @@ Face triangle_to_face(IVec3 &tri)
     return {tri.x, tri.y, tri.z}; // Directly initialize the vector
 }
 
-void MeshHalfEdge::buildHalfEdgeStructure(IVec3List &triangles)
+void MeshHalfEdge::buildHalfEdgeStructure(IVec3Span triangles)
 {
 
     initArray();

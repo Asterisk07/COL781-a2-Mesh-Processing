@@ -16,3 +16,9 @@ target_link_libraries(viewer glm::glm OpenGL::GL SDL2::SDL2)
 
 add_executable(example src/example.cpp)
 target_link_libraries(example viewer)
+
+add_executable(e1 src/e1.cpp src/mesh.cpp)
+target_link_libraries(e1 viewer)
+
+add_executable(e2 src/e2.cpp src/mesh.cpp)
+target_link_libraries(e2 viewer)
