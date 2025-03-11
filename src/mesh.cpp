@@ -5,9 +5,84 @@
 
 // };
 
-// void loadObjfile(){
+void MeshHalfEdge::loadObjfile(const std::string &filename)
+{
+    Vec3List vertices;
+    Vec2List texCoords;
+    Vec3List normals;
+    FaceList faces;
 
-// }
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        std::cerr << "Error: Cannot open OBJ file: " << filename << std::endl;
+        return;
+    }
+
+    std::string line;
+    while (std::getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string prefix;
+        iss >> prefix;
+
+        if (prefix == "v")
+        { // Vertex positions
+            Vec3 v;
+            iss >> v.x >> v.y >> v.z;
+            std::cout << "\tOne row of  vertices : " << v.x << " " << v.y << " " << v.z << std::endl;
+            vertices.push_back(v);
+
+            std::cout << "Current Vertices" << std::endl;
+            for (auto &i : vertices)
+            {
+                std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+            }
+        }
+        else if (prefix == "vt")
+        { // Texture coordinates
+            Vec2 vt;
+            iss >> vt.x >> vt.y;
+            texCoords.push_back(vt);
+        }
+        else if (prefix == "vn")
+        { // Vertex normals
+            Vec3 vn;
+            iss >> vn.x >> vn.y >> vn.z;
+            normals.push_back(vn);
+        }
+        else if (prefix == "f")
+        { // Faces
+            Face face;
+            std::string vertexData;
+            while (iss >> vertexData)
+            {
+                std::istringstream vss(vertexData);
+                std::string vIdx, vtIdx, vnIdx;
+                std::getline(vss, vIdx, '/');  // Read vertex index
+                std::getline(vss, vtIdx, '/'); // Read texture index (if exists)
+                std::getline(vss, vnIdx, '/'); // Read normal index (if exists)
+
+                // face.vertexIndices.push_back(std::stoi(vIdx) - 1); // OBJ indices start at 1
+                face.push_back(std::stoi(vIdx) - 1); // OBJ indices start at 1
+
+                // if (!vtIdx.empty()) face.texIndices.push_back(std::stoi(vtIdx) - 1);
+                // if (!vnIdx.empty()) face.normalIndices.push_back(std::stoi(vnIdx) - 1);
+            }
+            faces.push_back(face);
+        }
+    }
+
+    file.close();
+    this->vertexPosFromFile = std::move(vertices);
+    this->vertexPos = vertexPosFromFile;
+    // mesh.texCoords = texCoords;
+    this->vertexNormalFromFile = std::move(normals);
+    this->vertexNormal = vertexNormalFromFile;
+
+    this->buildHalfEdgeStructure(faces);
+    this->triangulateMesh();
+}
 
 // Base case for recursion: print the last argument
 template <typename T>

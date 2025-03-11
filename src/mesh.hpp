@@ -5,6 +5,8 @@
 #include "viewer.hpp"
 #include <span>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 enum HalfEdgeIndices
 {
@@ -22,12 +24,14 @@ using IntList = std::vector<int>;
 using FaceList = std::vector<Face>;
 
 using Vec3 = glm::vec3;
+using Vec2 = glm::vec2;
 using IVec3 = glm::ivec3;
 using Edge = glm::ivec2;
 using Vec = std::vector<int>;
 using HalfEdge = std::array<int, 4>;
 
 using Vec3List = std::vector<Vec3>;
+using Vec2List = std::vector<Vec2>;
 using Vec3Span = std::span<Vec3>;
 using IVec3List = std::vector<IVec3>;
 // using IVec3Array = IVec3[];
@@ -42,11 +46,12 @@ class MeshHalfEdge
 {
 
 public:
-    Vec3Span vertexPos;    // n x 3 vertex positions
-    Vec3Span vertexNormal; // n x 3 vertex normals
-    // Vec3List vertexNormal; // n x 3 vertex normals
-    Vec3List faceNormals;  // m x 3 face normals
-    HalfEdgeList halfEdge; // e x 4 (PAIR, NEXT, HEAD, LEFT)
+    Vec3Span vertexPos;            // n x 3 vertex positions
+    Vec3List vertexPosFromFile;    // n x 3 vertex positions
+    Vec3Span vertexNormal;         // n x 3 vertex normals
+    Vec3List vertexNormalFromFile; // n x 3 vertex normals
+    Vec3List faceNormals;          // m x 3 face normals
+    HalfEdgeList halfEdge;         // e x 4 (PAIR, NEXT, HEAD, LEFT)
 
     // Optional but useful
     IntList vertexHalfEdge;     // Maps vertex index → one outgoing half-edge
@@ -71,7 +76,29 @@ public:
 
     void debugInfo()
     {
-        std::cout << vertexPos.size() << triangleVertices.size() << edges.size() << std::endl;
+
+        std::cout << " | Vertices " << vertexPos.size() << " | triangles " << triangleVertices.size() << " | Edges " << edges.size() << std::endl;
+
+        std::cout << "Vertices" << std::endl;
+        for (auto &i : vertexPos)
+        {
+            std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+        }
+        std::cout << "Normals" << std::endl;
+        for (auto &i : vertexNormal)
+        {
+            std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+        }
+        std::cout << "Edges" << std::endl;
+        for (auto &i : edges)
+        {
+            std::cout << i.x << " " << i.y << std::endl;
+        }
+        std::cout << "Triangles" << std::endl;
+        for (auto &i : triangleVertices)
+        {
+            std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+        }
     }
 
     void triangulateMesh()
@@ -82,6 +109,8 @@ public:
             triangulateFace(i);
         }
     }
+
+    void loadObjfile(const std::string &filename);
 };
 // void findBoundaryEdges();
 // // void extractEdgesFromFaces();
