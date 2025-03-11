@@ -70,8 +70,8 @@ void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
                 face.push_back(std::stoi(vIdx) - 1); // OBJ indices start at 1
 
                 // if (!vtIdx.empty()) face.texIndices.push_back(std::stoi(vtIdx) - 1);
-                if (!vnIdx.empty())
-                    face.normalIndices.push_back(std::stoi(vnIdx) - 1);
+                // if (!vnIdx.empty())
+                //     face.normalIndices.push_back(std::stoi(vnIdx) - 1);
             }
             faces.push_back(face);
         }
@@ -79,10 +79,10 @@ void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
 
     file.close();
     // this->vertexPosFromFile = std::move(vertices);
-    // this->vertexPos = vertexPosFromFile;
+    this->vertexPos = vertices;
     // // mesh.texCoords = texCoords;
     // this->vertexNormalFromFile = std::move(normals);
-    // this->vertexNormal = vertexNormalFromFile;
+    this->vertexNormal = normals;
 
     // this->buildHalfEdgeStructure(faces);
     // this->triangulateMesh();
