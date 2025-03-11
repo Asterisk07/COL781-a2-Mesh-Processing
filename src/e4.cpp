@@ -28,20 +28,25 @@ int main()
 
     /* ------------------------------------ ------------------------------------*/
 
+    Vec3List vertices;
+    Vec2List texCoords;
+    Vec3List normals;
+    FaceList faces;
+
     // Create mesh using half-edge structure
     MeshHalfEdge mesh;
     // const std::string filename = "meshes/cube.obj";
-    const std::string filename = "meshes/cube.obj";
-    // const std::string filename = "meshes/try_tri.obj";
-    mesh.loadObjfile(filename);
+    // const std::string filename = "meshes/cube.obj";
+    const std::string filename = "meshes/try_tri.obj";
+    mesh.loadObjfile(filename, vertices, texCoords, normals, faces);
 
     // // set Attribs
-    // mesh.vertexPos = vertices;
-    // mesh.vertexNormal = normals;
+    mesh.vertexPos = vertices;
+    mesh.vertexNormal = normals;
 
     // Build half-edge structure
-    // mesh.buildHalfEdgeStructure(faces);
-    // mesh.triangulateMesh();
+    mesh.buildHalfEdgeStructure(faces);
+    mesh.triangulateMesh();
 
     /* ------------------------------------ ------------------------------------*/
 

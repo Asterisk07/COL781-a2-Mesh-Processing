@@ -46,12 +46,12 @@ class MeshHalfEdge
 {
 
 public:
-    Vec3Span vertexPos;            // n x 3 vertex positions
-    Vec3List vertexPosFromFile;    // n x 3 vertex positions
-    Vec3Span vertexNormal;         // n x 3 vertex normals
-    Vec3List vertexNormalFromFile; // n x 3 vertex normals
-    Vec3List faceNormals;          // m x 3 face normals
-    HalfEdgeList halfEdge;         // e x 4 (PAIR, NEXT, HEAD, LEFT)
+    Vec3Span vertexPos; // n x 3 vertex positions
+    // Vec3List vertexPosFromFile;    // n x 3 vertex positions
+    Vec3Span vertexNormal; // n x 3 vertex normals
+    // Vec3List vertexNormalFromFile; // n x 3 vertex normals
+    Vec3List faceNormals;  // m x 3 face normals
+    HalfEdgeList halfEdge; // e x 4 (PAIR, NEXT, HEAD, LEFT)
 
     // Optional but useful
     IntList vertexHalfEdge;     // Maps vertex index → one outgoing half-edge
@@ -110,7 +110,12 @@ public:
         }
     }
 
-    void loadObjfile(const std::string &filename);
+    // void loadObjfile(const std::string &filename);
+
+    void loadObjfile(const std::string &filename, Vec3List &vertices,
+                     Vec2List &texCoords,
+                     Vec3List &normals,
+                     FaceList &faces);
 };
 // void findBoundaryEdges();
 // // void extractEdgesFromFaces();

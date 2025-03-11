@@ -5,12 +5,15 @@
 
 // };
 
-void MeshHalfEdge::loadObjfile(const std::string &filename)
+void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
+                               Vec2List &texCoords,
+                               Vec3List &normals,
+                               FaceList &faces)
 {
-    Vec3List vertices;
-    Vec2List texCoords;
-    Vec3List normals;
-    FaceList faces;
+    // Vec3List vertices;
+    // Vec2List texCoords;
+    // Vec3List normals;
+    // FaceList faces;
 
     std::ifstream file(filename);
     if (!file.is_open())
@@ -74,14 +77,14 @@ void MeshHalfEdge::loadObjfile(const std::string &filename)
     }
 
     file.close();
-    this->vertexPosFromFile = std::move(vertices);
-    this->vertexPos = vertexPosFromFile;
-    // mesh.texCoords = texCoords;
-    this->vertexNormalFromFile = std::move(normals);
-    this->vertexNormal = vertexNormalFromFile;
+    // this->vertexPosFromFile = std::move(vertices);
+    // this->vertexPos = vertexPosFromFile;
+    // // mesh.texCoords = texCoords;
+    // this->vertexNormalFromFile = std::move(normals);
+    // this->vertexNormal = vertexNormalFromFile;
 
-    this->buildHalfEdgeStructure(faces);
-    this->triangulateMesh();
+    // this->buildHalfEdgeStructure(faces);
+    // this->triangulateMesh();
 }
 
 // Base case for recursion: print the last argument
@@ -205,9 +208,11 @@ void MeshHalfEdge::triangulateFace(int faceIdx)
     // triangulates face and adds triangle to triangleVertices
     // int h = FaceHalfEdge[faceIdx];
     // HalfEdge h =
+    print("Triangulate Face called");
     HalfEdge h;
 
     h = halfEdge[FaceHalfEdge[faceIdx]];
+
     int x = -1, y = -1, z = -1;
     x = h[HEAD];
     print("currently h[HEAD] = ", h[HEAD]);
@@ -221,11 +226,13 @@ void MeshHalfEdge::triangulateFace(int faceIdx)
         if (y == -1)
         {
             edges.push_back(Edge(x, z));
+            print("Added edge 1 : ", x, "->", z);
         }
         else
         {
             // edges.push_back({y, z});
             edges.push_back(Edge(y, z));
+            print("Added edge 2 : ", y, "->", z);
 
             // IVec3 tri(x, y, z);
             triangleVertices.push_back(IVec3(x, y, z));
@@ -235,6 +242,9 @@ void MeshHalfEdge::triangulateFace(int faceIdx)
         h = halfEdge[h[NEXT]];
         print("x,y,z", x, y, z);
     }
+
+    edges.push_back(Edge(z, x));
+    print("Added edge 2 : ", z, "->", x);
 }
 // void MeshHalfEdge::extractEdgesFromFaces();
 
