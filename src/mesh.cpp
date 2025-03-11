@@ -82,6 +82,10 @@ void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
     this->vertexPos = vertices;
     // // mesh.texCoords = texCoords;
     // this->vertexNormalFromFile = std::move(normals);
+    if (normals.size() < vertices.size())
+    {
+        normals.resize(vertices.size(), Vec3(0.0f, 0.0f, 0.0f)); // Extend with zero normals
+    }
     this->vertexNormal = normals;
 
     // this->buildHalfEdgeStructure(faces);
