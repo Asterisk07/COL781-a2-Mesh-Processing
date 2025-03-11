@@ -35,12 +35,12 @@ int main()
 
     // Create mesh using half-edge structure
     MeshHalfEdge mesh;
-    // const std::string filename = "meshes/cube.obj";
+    const std::string filename = "meshes/cube.obj";
     // const std::string filename = "meshes/cube.obj";
     // const std::string filename = "meshes/try_tri.obj";
     // const std::string filename = "meshes/spot_control_mesh.obj";
     // const std::string filename = "meshes/bunny_1k.obj";
-    const std::string filename = "meshes/try_bunny.obj";
+    // const std::string filename = "meshes/try_spot.obj";
     mesh.loadObjfile(filename, vertices, texCoords, normals, faces);
 
     // // set Attribs

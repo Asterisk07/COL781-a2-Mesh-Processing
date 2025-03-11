@@ -70,7 +70,8 @@ void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
                 face.push_back(std::stoi(vIdx) - 1); // OBJ indices start at 1
 
                 // if (!vtIdx.empty()) face.texIndices.push_back(std::stoi(vtIdx) - 1);
-                // if (!vnIdx.empty()) face.normalIndices.push_back(std::stoi(vnIdx) - 1);
+                if (!vnIdx.empty())
+                    face.normalIndices.push_back(std::stoi(vnIdx) - 1);
             }
             faces.push_back(face);
         }
@@ -203,6 +204,16 @@ void print()
 {
 }
 
+void MeshHalfEdge::computeFaceNormal(IVec3 &tri)
+{
+
+    glm::vec3 edge1 = vertexPos[tri.z] - vertexPos[tri.y];
+    glm::vec3 edge2 = vertexPos[tri.y] - vertexPos[tri.x];
+
+    glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
+    faceNormals.push_back(faceNormal);
+}
+
 void MeshHalfEdge::triangulateFace(int faceIdx)
 {
     // triangulates face and adds triangle to triangleVertices
@@ -234,8 +245,12 @@ void MeshHalfEdge::triangulateFace(int faceIdx)
             edges.push_back(Edge(y, z));
             print("Added edge 2 : ", y, "->", z);
 
-            // IVec3 tri(x, y, z);
-            triangleVertices.push_back(IVec3(x, y, z));
+            IVec3 tri(x, y, z);
+            // IVec3(x, y, z)
+            triangleVertices.push_back(tri);
+            computeFaceNormal(tri);
+
+            // faceNormals
         }
 
         y = z;
@@ -246,6 +261,10 @@ void MeshHalfEdge::triangulateFace(int faceIdx)
     edges.push_back(Edge(z, x));
     print("Added edge 2 : ", z, "->", x);
 }
+
+// void computeVertexNormals{
+
+// }
 // void MeshHalfEdge::extractEdgesFromFaces();
 
 // // part2

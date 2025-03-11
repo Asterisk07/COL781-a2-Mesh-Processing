@@ -89,16 +89,16 @@ public:
         {
             std::cout << i.x << " " << i.y << " " << i.z << std::endl;
         }
-        std::cout << "Edges" << std::endl;
-        for (auto &i : edges)
-        {
-            std::cout << i.x << " " << i.y << std::endl;
-        }
-        std::cout << "Triangles" << std::endl;
-        for (auto &i : triangleVertices)
-        {
-            std::cout << i.x << " " << i.y << " " << i.z << std::endl;
-        }
+        // std::cout << "Edges" << std::endl;
+        // for (auto &i : edges)
+        // {
+        //     std::cout << i.x << " " << i.y << std::endl;
+        // }
+        // std::cout << "Triangles" << std::endl;
+        // for (auto &i : triangleVertices)
+        // {
+        //     std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+        // }
     }
 
     void triangulateMesh()
@@ -112,10 +112,15 @@ public:
 
     // void loadObjfile(const std::string &filename);
 
+    // part3
     void loadObjfile(const std::string &filename, Vec3List &vertices,
                      Vec2List &texCoords,
                      Vec3List &normals,
                      FaceList &faces);
+
+    // part4
+    void computeFaceNormal(IVec3 &tri);
+    void computeVertexNormals();
 };
 // void findBoundaryEdges();
 // // void extractEdgesFromFaces();
@@ -128,10 +133,6 @@ public:
 // // part3
 // void loadOBJ(std::string filename);
 // void saveOBJ(std::string filename);
-
-// // part4
-// void computeFaceNormals();
-// void computeVertexNormals();
 
 // auto resizeByN = [&](auto &vec)
 // { vec.resize(vec.size() + n); };
