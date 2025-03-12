@@ -111,6 +111,9 @@ void print(const T &first, const Args &...rest)
 // part1
 Key enkey(int x, int y)
 {
+    // print("KEY : ", x, " + ", y, " = ", (Key(x) << 32) | y);
+
+    // return ((Key(x) * 10) + y);
     return ((Key(x) << 32) | y);
 }
 
@@ -128,7 +131,7 @@ void MeshHalfEdge::addFace(const Face &face)
 {
     int n = face.size();
     assert(n > 0);
-    int key;
+    Key key;
     // HalfEdge *h;
 
     int faceIdx = FaceHalfEdge.size();
@@ -154,8 +157,11 @@ void MeshHalfEdge::addFace(const Face &face)
         vertexHalfEdge[vertex] = h;
 
         key = enkey(nextVertex, vertex);
+
         if (halfedgeMap.find(key) != halfedgeMap.end())
         {
+            print("Found key ", key, "For vertices", nextVertex, vertex);
+            // print("")
             pair = halfedgeMap[key];
             halfEdge[h][PAIR] = pair;
             halfEdge[pair][PAIR] = h;
@@ -163,6 +169,8 @@ void MeshHalfEdge::addFace(const Face &face)
         else
         {
             key = enkey(vertex, nextVertex);
+
+            print("Added key ", key, "For vertices", vertex, nextVertex);
             halfedgeMap[key] = h;
         }
 
@@ -206,16 +214,6 @@ void MeshHalfEdge::buildHalfEdgeStructure(IVec3Span triangles)
 
 void print()
 {
-}
-
-void MeshHalfEdge::computeFaceNormal(IVec3 &tri)
-{
-
-    glm::vec3 edge1 = vertexPos[tri.z] - vertexPos[tri.y];
-    glm::vec3 edge2 = vertexPos[tri.y] - vertexPos[tri.x];
-
-    glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
-    faceNormals.push_back(faceNormal);
 }
 
 void MeshHalfEdge::triangulateFace(int faceIdx)
@@ -266,9 +264,140 @@ void MeshHalfEdge::triangulateFace(int faceIdx)
     print("Added edge 2 : ", z, "->", x);
 }
 
-// void computeVertexNormals{
+void MeshHalfEdge::computeFaceNormal(IVec3 &tri)
+{
 
+    glm::vec3 edge1 = vertexPos[tri.z] - vertexPos[tri.y];
+    glm::vec3 edge2 = vertexPos[tri.y] - vertexPos[tri.x];
+
+    glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
+    faceNormals.push_back(faceNormal);
+}
+
+// void getAdjacentFaces()
+// {
 // }
+
+// void computeVertexNormals_helper()
+// {
+//     // FaceList
+//     IntList faces = getAdjacentFaces();
+//     Vec3 normal;
+//     for (idx in faces)
+//     {
+//         normal = normal + faceNormals[idx];
+//     }
+//     normal = normal / faces.size();
+// }
+
+void MeshHalfEdge::computeVertexNormals()
+{
+    int h, f, count;
+    // Vec3 normal;
+
+    for (int v = 0; v < vertexPos.size(); v++)
+    {
+        std::cout << "Recomputing normals for vertex" << v << std::endl;
+        // i = newVec3;
+        Vec3 normal = {0.0f, 0.0f, 0.0f};
+        h = vertexHalfEdge[v];
+        count = 0;
+        do
+        {
+            std::cout << "\tHalfedge:" << h << std::endl;
+            if (h == -1)
+                break;
+            count++;
+            f = halfEdge[h][LEFT];
+            normal = normal + faceNormals[f];
+
+            h = halfEdge[h][NEXT];
+            h = halfEdge[h][PAIR];
+        } while (h != vertexHalfEdge[v]);
+        vertexNormal[v] = normal / (float)count;
+    }
+}
+
+void zeroVec(Vec3 &vec)
+{
+    vec.x = 0.0f;
+    vec.y = 0.0f;
+    vec.z = 0.0f;
+}
+
+void MeshHalfEdge::smoothen_step(float λ)
+{
+    int start;
+    int h;
+
+    int v1;
+    float count;
+    for (int v = 0; v < vertexPos.size(); v++)
+    {
+        // zeroVec(sum);
+        if (false)
+            print("Smoothen vertex", v);
+        Vec3 sum = Vec3(0.0f);
+
+        count = 0;
+        start = vertexHalfEdge[v];
+        h = start;
+        int loop_guard = 10; // Prevent infinite loops
+        do
+        {
+            count++;
+            if (false)
+                print(count, "number of neighbours");
+            v1 = halfEdge[h][HEAD];
+            sum = sum + vertexPos[v1];
+            h = halfEdge[h][PAIR];
+            h = halfEdge[h][NEXT];
+            if (loop_guard-- == 0)
+            {
+                std::cerr << "Error: Possible infinite loop detected in Laplacian smoothing!" << std::endl;
+                break;
+            }
+
+        } while (h != start);
+
+        if (count == 0.0f)
+            continue;
+        if (false)
+        {
+            print("count is", count);
+            print("sum is :", sum.x, " ", sum.y, " ", sum.z);
+        }
+        sum = sum / count;
+        sum = sum - vertexPos[v];
+        // print("updated by )
+        vertexPos[v] = vertexPos[v] + sum * λ;
+    }
+}
+void MeshHalfEdge::smoothen_taubin(float λ, float u, int iterations)
+{
+    // taubin
+    // traverse all vertices adjacent to a given vertex
+    // Vec3 sum(0.0f, 0.0f, 0.0f);
+    assert(λ >= 0);
+    assert(λ <= 1);
+    assert(u >= -11);
+    assert(u <= 0);
+
+    for (int iter = 0; iter < iterations; iter++)
+    {
+        smoothen_step(λ);
+        smoothen_step(u);
+    }
+}
+
+void MeshHalfEdge::smoothen_laplacian(float λ, int iterations)
+{
+    // taubin
+    // traverse all vertices adjacent to a given vertex
+    // Vec3 sum(0.0f, 0.0f, 0.0f);
+    smoothen_taubin(λ, 0.0f, iterations);
+}
+
 // void MeshHalfEdge::extractEdgesFromFaces();
 
 // // part2

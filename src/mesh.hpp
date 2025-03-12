@@ -7,6 +7,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+// #include <glm/gtc/magnitude.hpp> // Optional, part of GLM
+
+inline double edgeLength(const glm::vec3 &v1, const glm::vec3 &v2)
+{
+    return glm::length(v1 - v2); // Corrected for GLM
+}
 
 enum HalfEdgeIndices
 {
@@ -89,6 +95,23 @@ public:
         {
             std::cout << i.x << " " << i.y << " " << i.z << std::endl;
         }
+
+        std::cout << "Face Normals" << std::endl;
+        for (auto &i : faceNormals)
+        {
+            std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+        }
+        std::cout << "Half Edges\n"
+                  << "PAIR NEXT HEAD LEFT" << std::endl;
+        for (auto &i : halfEdge)
+        {
+            std::cout << i[0] << " " << i[1] << " " << i[2] << " " << i[3] << std::endl;
+            if (i[0] == -1)
+            {
+                std::cout << "ERROR " << std::endl;
+                break;
+            }
+        }
         // std::cout << "Edges" << std::endl;
         // for (auto &i : edges)
         // {
@@ -120,7 +143,33 @@ public:
 
     // part4
     void computeFaceNormal(IVec3 &tri);
-    void computeVertexNormals();
+    void computeVertexNormals(); // tk incomplete : handle boundaries
+
+    // part 5
+    void smoothen_laplacian(float λ, int iterations);
+    void smoothen_taubin(float λ, float u, int iterations);
+    void smoothen_step(float λ);
+
+    void computeEdgeStats()
+    {
+        std::vector<double> lengths;
+        double sum = 0.0, sumSq = 0.0;
+
+        for (auto &e : edges)
+        {
+            double len = edgeLength(vertexPos[e.x], vertexPos[e.y]);
+            lengths.push_back(len);
+            sum += len;
+            sumSq += len * len;
+        }
+
+        double mean = sum / lengths.size();
+        double variance = (sumSq / lengths.size()) - (mean * mean);
+        double stddev = sqrt(variance);
+
+        std::cout << "Mean Edge Length: " << mean << std::endl;
+        std::cout << "Standard Deviation: " << stddev << std::endl;
+    }
 };
 // void findBoundaryEdges();
 // // void extractEdgesFromFaces();
