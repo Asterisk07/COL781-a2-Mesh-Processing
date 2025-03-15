@@ -6,7 +6,52 @@
 #include <span>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <sstream>
+
+#include <algorithm> // Required for std::reverse
+
+inline void suppressStdout()
+{
+    std::cout.setstate(std::ios_base::failbit); // Disable cout
+}
+
+inline void restoreStdout()
+{
+    std::cout.clear(); // Restore cout
+}
+
+#include <cmath>
+
+// Base case for recursion: print the last argument
+template <typename T>
+void print(const T &last)
+{
+    std::cout << last << std::endl;
+}
+
+template <typename T>
+void printerr(const T &last)
+{
+    std::cerr << last << std::endl;
+}
+
+// Variadic template function to handle multiple arguments
+template <typename T, typename... Args>
+void print(const T &first, const Args &...rest)
+{
+    std::cout << first << " "; // Print the first argument with a space
+    print(rest...);            // Recursively call print for remaining arguments
+}
+
+// Variadic template function to handle multiple arguments
+template <typename T, typename... Args>
+void printerr(const T &first, const Args &...rest)
+{
+    std::cerr << first << " "; // Print the first argument with a space
+    printerr(rest...);         // Recursively call print for remaining arguments
+}
+
 // #include <glm/gtc/magnitude.hpp> // Optional, part of GLM
 
 inline double edgeLength(const glm::vec3 &v1, const glm::vec3 &v2)
@@ -80,38 +125,113 @@ public:
         vertexHalfEdge.resize(vertexPos.size(), -1);
     }
 
+    void sanity_check();
     void debugInfo()
     {
 
         std::cout << " | Vertices " << vertexPos.size() << " | triangles " << triangleVertices.size() << " | Edges " << edges.size() << std::endl;
 
+        // Print vertex index, position, and normal on the same line
         std::cout << "Vertices" << std::endl;
-        for (auto &i : vertexPos)
+        for (size_t idx = 0; idx < vertexPos.size(); idx++)
         {
-            std::cout << i.x << " " << i.y << " " << i.z << std::endl;
-        }
-        std::cout << "Normals" << std::endl;
-        for (auto &i : vertexNormal)
-        {
-            std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+            std::cout << idx << ": (" << vertexPos[idx].x << ", " << vertexPos[idx].y << ", " << vertexPos[idx].z << ")"
+                      << " | Normal: (" << vertexNormal[idx].x << ", " << vertexNormal[idx].y << ", " << vertexNormal[idx].z << ")"
+                      << std::endl;
         }
 
-        std::cout << "Face Normals" << std::endl;
-        for (auto &i : faceNormals)
+        // Print face index, vertex indices, and face normal
+        std::cout << "Faces" << std::endl;
+        for (size_t idx = 0; idx < triangleVertices.size(); idx++)
         {
-            std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+            std::cout << idx << ": [" << triangleVertices[idx].x << ", " << triangleVertices[idx].y << ", " << triangleVertices[idx].z << "]"
+                      << " | Face Normal: (" << faceNormals[idx].x << ", " << faceNormals[idx].y << ", " << faceNormals[idx].z << ")"
+                      << std::endl;
         }
-        std::cout << "Half Edges\n"
-                  << "PAIR NEXT HEAD LEFT" << std::endl;
-        for (auto &i : halfEdge)
+
+        // count appeareances
+        // {
+        //     std::unordered_map<int, int> vertexCount;
+
+        //     // Count vertex occurrences
+        //     for (const auto &face : triangleVertices)
+        //     {
+        //         vertexCount[face.x]++;
+        //         vertexCount[face.y]++;
+        //         vertexCount[face.z]++;
+        //     }
+
+        //     // Print the results
+        //     std::cerr << "Vertex appearances in triangles:\n";
+        //     for (const auto &[vertex, count] : vertexCount)
+        //     {
+        //         std::cerr << "Vertex " << vertex << " appears in " << count << " triangles.\n";
+        //     }
+        // }
+
+        // std::cout << "Vertices" << std::endl;
+        // for (auto &i : vertexPos)
+        // {
+        //     std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+        // }
+        // std::cout << "Normals" << std::endl;
+        // for (auto &i : vertexNormal)
+        // {
+        //     std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+        // }
+
+        // std::cout << "Face Normals" << std::endl;
+        // for (auto &i : faceNormals)
+        // {
+        //     std::cout << i.x << " " << i.y << " " << i.z << std::endl;
+        // }
+        // std::cout << "Half Edges\n"
+        //   << "PAIR NEXT HEAD LEFT" << std::endl;
+        int flag = 1;
+
+        int h;
+        int f;
         {
-            std::cout << i[0] << " " << i[1] << " " << i[2] << " " << i[3] << std::endl;
+            int v = 7;
+            h = vertexHalfEdge[v];
+            // h = halfEdge[h][PAIR];
+            // HalfEdge *h = v->halfEdge;
+            print("Face traversal from vertex", v);
+            do
+            {
+
+                // do something with h->left;
+                f = halfEdge[h][LEFT];
+                print("he ", h, "Face ", f);
+                h = halfEdge[h][NEXT];
+                // print("Next he ", h, "Face ", f, "head ", halfEdge[h][HEAD];);
+                h = halfEdge[h][PAIR];
+
+            } while (h != vertexHalfEdge[v]);
+        }
+        // for (int i = 0; i < vertexHalfEdge.size(); i++)
+        // {
+        //     h = vertexHalfEdge[i];
+        // std::cout << "Vertex " << i << " Points to " << h << "of head" << halfEdge[h][HEAD] << std::endl;
+        // }
+
+        // for (auto &i : halfEdge)
+        print("Half edges : \nPAIR NEXT HEAD LEFT");
+        for (int h = 0; h < halfEdge.size(); h++)
+        {
+            auto i = halfEdge[h];
+            if (h == 21 | h == 8 | h == 7)
+                std::cout << h << ":" << i[0] << " " << i[1] << " " << i[2] << " " << i[3] << std::endl;
             if (i[0] == -1)
             {
                 std::cout << "ERROR " << std::endl;
+                flag = 0;
                 break;
             }
+            // if (h==)
         }
+        if (flag)
+            std::cout << "All half edge have pair" << std::endl;
         // std::cout << "Edges" << std::endl;
         // for (auto &i : edges)
         // {
@@ -142,7 +262,8 @@ public:
                      FaceList &faces);
 
     // part4
-    void computeFaceNormal(IVec3 &tri);
+    void computeTriangleNormal(IVec3 &tri);
+    Vec3 computeFaceNormal(int x, int y, int z);
     void computeVertexNormals(); // tk incomplete : handle boundaries
 
     // part 5
@@ -175,9 +296,10 @@ public:
 // // void extractEdgesFromFaces();
 
 // // part2
-// void generateGridMesh(int m, int n);
-// void generateSphereMesh(int m, int n);
-// void enerateCubeMesh(int m, int n, int o);
+void generateCustomGrid(int m, int n, float a, int axis, const std::string &filename);
+void generateGrid(int m, int n, const std::string &filename);
+void generateSphere(int m, int n, const std::string &filename);
+void generateCube(int m, int n, int o, const std::string &filename);
 
 // // part3
 // void loadOBJ(std::string filename);

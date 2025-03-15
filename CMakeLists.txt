@@ -31,3 +31,6 @@ target_link_libraries(e4 viewer)
 
 add_executable(e5 src/e5.cpp src/mesh.cpp)
 target_link_libraries(e5 viewer)
+
+add_executable(e6 src/e6.cpp src/mesh.cpp)
+target_link_libraries(e6 viewer)
