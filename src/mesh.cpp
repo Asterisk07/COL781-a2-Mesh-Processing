@@ -327,6 +327,10 @@ void MeshHalfEdge::buildHalfEdgeStructure(VecList &faces)
         addFace(face, prev);
     }
     handleBoundaryVertices(prev);
+    if (vertexNormal.size() < vertexPos.size())
+    {
+        vertexNormal.resize(vertexPos.size(), Vec3(0.0f, 0.0f, 0.0f)); // Extend with zero normals
+    }
 }
 
 Face triangle_to_face(IVec3 &tri)
@@ -346,6 +350,10 @@ void MeshHalfEdge::buildHalfEdgeStructure(IVec3Span triangles)
         addFace(triangle_to_face(tri), prev);
     }
     handleBoundaryVertices(prev);
+    if (vertexNormal.size() < vertexPos.size())
+    {
+        vertexNormal.resize(vertexPos.size(), Vec3(0.0f, 0.0f, 0.0f)); // Extend with zero normals
+    }
     // buildHalfEdgeStructure(faces);
 }
 
