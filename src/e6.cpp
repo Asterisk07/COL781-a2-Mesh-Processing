@@ -44,12 +44,12 @@ int main()
     // const std::string filename = "meshes/try_pyramid.obj";
     // const std::string filename = "meshes/spot_control_mesh.obj";
     // const std::string filename = "meshes/bunny_1k.obj";
-    // const std::string filename = "meshes/try_spot.obj";
-    generateGrid(4, 2, filename);
+    const std::string filename = "meshes/try_spot.obj";
+    // generateGrid(3, 3, filename);
     // generateCustomGrid(4, 2, -1, 1, filename);
-    // generateSphere(4, 6, filename);
+    // generateSphere(7, 9, filename);
     // generateCube(2, 3, 4, filename);
-    // generateCube(2, 2, 2, filename);
+    // generateCube(3, 3, 3, filename);
     // generateCube(4, 2, 5, filename);
     // generateCube(1, 1, 1, filename);
     mesh.loadObjfile(filename, vertices, texCoords, normals, faces);
@@ -60,9 +60,16 @@ int main()
 
     // Build half-edge structure
     mesh.buildHalfEdgeStructure(faces);
+    // Extrude cube
+    // for (int i = 0; i < 6; i++)
+    // {
+    //     mesh.extrudeFace(i * 9 + 4, 0.3);
+    // }
+
     mesh.sanity_check();
     std::cerr << "Here 0" << std::endl;
     // mesh.debugInfo();
+
     std::cerr << "Here" << std::endl;
     mesh.triangulateMesh();
     std::cerr << "Here 2\n";

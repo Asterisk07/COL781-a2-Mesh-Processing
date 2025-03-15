@@ -98,21 +98,20 @@ class MeshHalfEdge
 {
 
 public:
-    Vec3Span vertexPos; // n x 3 vertex positions
+    Vec3List vertexPos; // n x 3 vertex positions
     // Vec3List vertexPosFromFile;    // n x 3 vertex positions
-    Vec3Span vertexNormal; // n x 3 vertex normals
+    Vec3List vertexNormal; // n x 3 vertex normals
     // Vec3List vertexNormalFromFile; // n x 3 vertex normals
-    Vec3List faceNormals;  // m x 3 face normals
+    // Vec3List faceNormals;  // m x 3 face normals
     HalfEdgeList halfEdge; // e x 4 (PAIR, NEXT, HEAD, LEFT)
 
-    // Optional but useful
     IntList vertexHalfEdge;     // Maps vertex index → one outgoing half-edge
     IntList FaceHalfEdge;       // Maps face index → one half-edge
     EdgeMap halfedgeMap;        // Edge lookup table
     IVec3List triangleVertices; // Explicit triangle indices for rendering
     EdgeList edges;             // Explicit triangle edges for rendering
     // EdgeSpan edges;             // Explicit triangle edges for rendering
-    VecList faceVertices; // Explicit face indices for rendering
+    // VecList faceVertices; // Explicit face indices for rendering
 
     // part1
     void addFace(const Face &face, IntList &prev);
@@ -136,19 +135,27 @@ public:
         std::cerr << "Vertices" << std::endl;
         for (size_t idx = 0; idx < vertexPos.size(); idx++)
         {
-            std::cout << idx << ": (" << vertexPos[idx].x << ", " << vertexPos[idx].y << ", " << vertexPos[idx].z << ")"
+            std::cerr << idx << ": (" << vertexPos[idx].x << ", " << vertexPos[idx].y << ", " << vertexPos[idx].z << ")"
                       << " | Normal: (" << vertexNormal[idx].x << ", " << vertexNormal[idx].y << ", " << vertexNormal[idx].z << ")"
                       << std::endl;
         }
 
         // Print face index, vertex indices, and face normal
         std::cerr << "Faces" << std::endl;
-        for (size_t idx = 0; idx < triangleVertices.size(); idx++)
+
+        int numFaces = FaceHalfEdge.size();
+        for (int i = 0; i < numFaces; i++)
         {
-            std::cout << idx << ": [" << triangleVertices[idx].x << ", " << triangleVertices[idx].y << ", " << triangleVertices[idx].z << "]"
-                      << " | Face Normal: (" << faceNormals[idx].x << ", " << faceNormals[idx].y << ", " << faceNormals[idx].z << ")"
-                      << std::endl;
+            // triangulateFace(i);
+            std::cerr << i << " :  " << FaceHalfEdge[i] << std::endl;
         }
+        // FaceHalfEdge
+        // for (size_t idx = 0; idx < triangleVertices.size(); idx++)
+        // {
+        //     std::cerr << idx << ": [" << triangleVertices[idx].x << ", " << triangleVertices[idx].y << ", " << triangleVertices[idx].z << "]"
+
+        //               << std::endl;
+        // }
 
         // count appeareances
         // {
@@ -292,6 +299,8 @@ public:
         std::cout << "Mean Edge Length: " << mean << std::endl;
         std::cout << "Standard Deviation: " << stddev << std::endl;
     }
+
+    void extrudeFace(int faceidx, float multiplier = 1.0f);
 };
 // void findBoundaryEdges();
 // // void extractEdgesFromFaces();

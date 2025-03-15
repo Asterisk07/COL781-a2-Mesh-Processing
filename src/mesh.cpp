@@ -78,15 +78,15 @@ void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
     }
 
     file.close();
-    // this->vertexPosFromFile = std::move(vertices);
-    this->vertexPos = vertices;
+    this->vertexPos = std::move(vertices);
+    // this->vertexPos = vertices;
     // // mesh.texCoords = texCoords;
-    // this->vertexNormalFromFile = std::move(normals);
     if (normals.size() < vertices.size())
     {
         normals.resize(vertices.size(), Vec3(0.0f, 0.0f, 0.0f)); // Extend with zero normals
     }
-    this->vertexNormal = normals;
+    this->vertexNormal = std::move(normals);
+    // this->vertexNormal = normals;
 
     // this->buildHalfEdgeStructure(faces);
     // this->triangulateMesh();
@@ -126,6 +126,80 @@ Key enkey(int x, int y)
 
 //     halfEdge.resize(this->size() + m);
 // }
+
+// void MeshHalfEdge::extrudeFace(int faceidx)
+// {
+// }
+void MeshHalfEdge::extrudeFace(int faceidx, float multiplier)
+{
+
+    int h = FaceHalfEdge[faceidx];
+
+    int u = -1, v = -1, w = -1;
+    u = halfEdge[h][HEAD];
+    h = halfEdge[h][NEXT];
+    v = halfEdge[h][HEAD];
+    h = halfEdge[h][NEXT];
+
+    int H_old = halfEdge.size();
+    FaceHalfEdge[faceidx] = H_old + 3;
+    int V_old = vertexPos.size();
+
+    int start = h;
+    int x;
+
+    do
+    {
+
+        w = halfEdge[h][HEAD];
+
+        int V = vertexPos.size();
+        int H = halfEdge.size();
+        int F = FaceHalfEdge.size();
+        FaceHalfEdge.push_back(H);
+
+        // halfEdge[h][NEXT] = H;
+
+        vertexPos.push_back(vertexPos[v]);
+        vertexNormal.push_back(vertexNormal[v]);
+
+        printerr("Now size of vertices : ", vertexPos.size());
+
+        vertexHalfEdge.push_back(H + 3);
+        halfEdge.push_back(std::array<int, 4>{H + 6, H + 1, V + 1, F});
+        halfEdge.push_back(std::array<int, 4>{H + 3, H + 2, V, F});
+        halfEdge.push_back(std::array<int, 4>{H - 4, h, v, F});
+        halfEdge.push_back(std::array<int, 4>{H + 1, H + 7, V + 1, faceidx});
+
+        if (halfEdge[h][NEXT] == start)
+        {
+            // i.e. this is last one
+            halfEdge[H][PAIR] = H_old + 2;
+            halfEdge[H_old + 2][PAIR] = H;
+
+            halfEdge[H][HEAD] = V_old;
+            halfEdge[H + 3][HEAD] = V_old;
+
+            halfEdge[H + 3][NEXT] = H_old + 3;
+        }
+
+        Vec3 normal = {0.0f, 0.0f, 0.0f};
+        normal = multiplier * computeFaceNormal(u, v, w);
+        // dupliacte vertices
+
+        // extrude vertex
+        vertexPos[V] = vertexPos[V] + normal;
+
+        // update variables
+        u = v;
+        v = w;
+
+        x = halfEdge[h][NEXT];
+        halfEdge[h][NEXT] = H;
+        h = x;
+
+    } while (h != start);
+}
 
 void MeshHalfEdge::addFace(const Face &face, IntList &prev)
 {
@@ -315,7 +389,7 @@ void MeshHalfEdge::triangulateFace(int faceIdx)
             IVec3 tri(x, y, z);
             // IVec3(x, y, z)
             triangleVertices.push_back(tri);
-            computeTriangleNormal(tri);
+            // computeTriangleNormal(tri);
 
             // faceNormals
         }
@@ -329,15 +403,15 @@ void MeshHalfEdge::triangulateFace(int faceIdx)
     print("Added edge 2 : ", z, "->", x);
 }
 
-void MeshHalfEdge::computeTriangleNormal(IVec3 &tri)
-{
+// void MeshHalfEdge::computeTriangleNormal(IVec3 &tri)
+// {
 
-    glm::vec3 edge1 = vertexPos[tri.z] - vertexPos[tri.y];
-    glm::vec3 edge2 = vertexPos[tri.y] - vertexPos[tri.x];
+//     glm::vec3 edge1 = vertexPos[tri.z] - vertexPos[tri.y];
+//     glm::vec3 edge2 = vertexPos[tri.y] - vertexPos[tri.x];
 
-    glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
-    faceNormals.push_back(faceNormal);
-}
+//     glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
+//     faceNormals.push_back(faceNormal);
+// }
 
 Vec3 MeshHalfEdge::computeFaceNormal(int x, int y, int z)
 {
@@ -388,13 +462,13 @@ void MeshHalfEdge::sanity_check()
         else if (halfEdge[pair][PAIR] != h)
         // if (pair != -1 && halfEdge[pair][PAIR] != h)
         {
-            std::cerr << "ERROR: Half-edge " << h << " and its pair " << pair << " are not mutual pairs!" << std::endl;
+            std::cerr << "ERROR: Half-edge " << h << " and its pair " << pair << " (points to " << halfEdge[pair][PAIR] << ") are not mutual pairs!" << std::endl;
         }
 
         // Check valid HEAD
         if (head < 0 || head >= vertexPos.size())
         {
-            std::cerr << "ERROR: Half-edge " << h << " points to an invalid vertex!" << std::endl;
+            std::cerr << "ERROR: Half-edge " << h << " points to an invalid vertex : " << head << std::endl;
         }
     }
 
@@ -420,38 +494,38 @@ void MeshHalfEdge::sanity_check()
         int start = h;
         int count = 0;
 
-        std::cout << "Neighbors of vertex " << v << ": ";
+        // std::cout << "Neighbors of vertex " << v << ": ";
 
-        do
-        {
-            if (h == -1)
-            {
-                std::cerr << "ERROR: Null half-edge encountered at vertex " << v << "!" << std::endl;
-                break;
-            }
+        // do
+        // {
+        //     if (h == -1)
+        //     {
+        //         std::cerr << "ERROR: Null half-edge encountered at vertex " << v << "!" << std::endl;
+        //         break;
+        //     }
 
-            int neighbor = halfEdge[h][HEAD];
-            std::cout << neighbor << " ";
+        //     int neighbor = halfEdge[h][HEAD];
+        //     std::cout << neighbor << " ";
 
-            h = halfEdge[h][PAIR]; // Move to opposite half-edge
+        //     h = halfEdge[h][PAIR]; // Move to opposite half-edge
 
-            if (h == -1)
-            {
-                std::cerr << "ERROR: Boundary edge encountered at vertex " << v << "!" << std::endl;
-                break;
-            }
+        //     if (h == -1)
+        //     {
+        //         std::cerr << "ERROR: Boundary edge encountered at vertex " << v << "!" << std::endl;
+        //         break;
+        //     }
 
-            h = halfEdge[h][NEXT]; // Move to next outgoing edge
+        //     h = halfEdge[h][NEXT]; // Move to next outgoing edge
 
-            count++;
+        //     count++;
 
-            if (count > 20) // Detect infinite loop
-            {
-                std::cerr << "ERROR: Possible infinite loop at vertex " << v << "!" << std::endl;
-                break;
-            }
+        //     if (count > 20) // Detect infinite loop
+        //     {
+        //         std::cerr << "ERROR: Possible infinite loop at vertex " << v << "!" << std::endl;
+        //         break;
+        //     }
 
-        } while (h != start); // Should complete the loop
+        // } while (h != start); // Should complete the loop
 
         std::cout << std::endl;
     }
@@ -1101,6 +1175,7 @@ void generateGrid(int m, int n, const std::string &filename)
 // void pushSphereFace(FaceList &faces, )
 
 void generateSphere(int m, int n, const std::string &filename)
+
 {
     std::vector<Vec3> vertices;
     std::vector<Vec3> normals;
