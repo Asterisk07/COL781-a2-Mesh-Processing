@@ -39,17 +39,18 @@ int main()
     // const std::string filename = "meshes/cube.obj";
     // const std::string filename = "meshes/cube.obj";
     // const std::string filename = "meshes/try_tri.obj";
-    const std::string filename = "meshes/try_new.obj";
+    // const std::string filename = "meshes/try_new.obj";
+    // const std::string filename = "meshes/try_square.obj";
     // const std::string filename = "meshes/try_pyramid.obj";
     // const std::string filename = "meshes/spot_control_mesh.obj";
     // const std::string filename = "meshes/bunny_1k.obj";
     // const std::string filename = "meshes/try_spot.obj";
-    // generateGrid(4, 2, filename);
+    generateGrid(4, 2, filename);
     // generateCustomGrid(4, 2, -1, 1, filename);
     // generateSphere(4, 6, filename);
     // generateCube(2, 3, 4, filename);
     // generateCube(2, 2, 2, filename);
-    generateCube(4, 2, 5, filename);
+    // generateCube(4, 2, 5, filename);
     // generateCube(1, 1, 1, filename);
     mesh.loadObjfile(filename, vertices, texCoords, normals, faces);
 
@@ -60,7 +61,11 @@ int main()
     // Build half-edge structure
     mesh.buildHalfEdgeStructure(faces);
     mesh.sanity_check();
+    std::cerr << "Here 0" << std::endl;
+    // mesh.debugInfo();
+    std::cerr << "Here" << std::endl;
     mesh.triangulateMesh();
+    std::cerr << "Here 2\n";
     // restoreStdout();
     // mesh.smoothen(0.8, 4);
     // mesh.computeEdgeStats();
@@ -81,7 +86,7 @@ int main()
     }
 
     // Set mesh data
-    mesh.debugInfo();
+    // mesh.debugInfo();
     v.setMesh(mesh.vertexPos.size(), mesh.triangleVertices.size(), mesh.edges.size(),
               mesh.vertexPos.data(), mesh.triangleVertices.data(), mesh.edges.data(), mesh.vertexNormal.data());
 

@@ -36,11 +36,11 @@ void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
             std::cout << "\tOne row of  vertices : " << v.x << " " << v.y << " " << v.z << std::endl;
             vertices.push_back(v);
 
-            std::cout << "Current Vertices" << std::endl;
-            for (auto &i : vertices)
-            {
-                std::cout << i.x << " " << i.y << " " << i.z << std::endl;
-            }
+            // std::cerr << "Current Vertices" << std::endl;
+            // for (auto &i : vertices)
+            // {
+            // std::cerr << i.x << " " << i.y << " " << i.z << std::endl;
+            // }
         }
         else if (prefix == "vt")
         { // Texture coordinates
@@ -127,7 +127,7 @@ Key enkey(int x, int y)
 //     halfEdge.resize(this->size() + m);
 // }
 
-void MeshHalfEdge::addFace(const Face &face)
+void MeshHalfEdge::addFace(const Face &face, IntList &prev)
 {
     int n = face.size();
     assert(n > 0);
@@ -139,6 +139,7 @@ void MeshHalfEdge::addFace(const Face &face)
     int m = halfEdge.size(); // Get starting index for new half-edges
 
     halfEdge.resize(m + n, {-1, -1, -1, -1}); // Resize for new half-edges
+    prev.resize(m + n, -1);                   // Resize for new half-edges
     // vertexHalfEdge.resize(vertexHalfEdge.size()+)
     int vertex;
     int nextVertex;
@@ -160,6 +161,7 @@ void MeshHalfEdge::addFace(const Face &face)
         {
             vertexHalfEdge[vertex] = h;
         }
+        prev[h] = vertex;
 
         key = enkey(nextVertex, vertex);
 
@@ -212,13 +214,45 @@ void MeshHalfEdge::addFace(const Face &face)
     }
 };
 
+void MeshHalfEdge::handleBoundaryVertices(IntList &prev)
+{
+    // Define : boudary half edge : pair == -1
+    // Assumption : a vertex has either no boundary half edges, or exactly one outgoign and one incoming boundary half edge .
+
+    // using HalfEdge = std::array<int, 4>;
+    // vertexhalfedge -> outgoing half edges
+    int u, v;
+    int n = halfEdge.size();
+    for (int h = 0; h < n; h++)
+    {
+        if (halfEdge[h][PAIR] != -1)
+            continue;
+        u = prev[h];
+        v = halfEdge[h][HEAD];
+        halfEdge[h][PAIR] = halfEdge.size();
+        vertexHalfEdge[v] = halfEdge.size();
+        HalfEdge dummy;
+        dummy[HEAD] = u;
+        dummy[PAIR] = h;
+        dummy[NEXT] = -1;
+        dummy[LEFT] = -1;
+        halfEdge.push_back(dummy);
+    }
+}
+
 void MeshHalfEdge::buildHalfEdgeStructure(VecList &faces)
 {
+    // Assumption : either manifold or manifold with boundary
+    // Hence : No half edges has NEXT == -1
     initArray();
+    // IntMap boundaryEdgeTailMap; // Maps boundary edge h -> tail vertex u
+    IntList prev;
+
     for (Face &face : faces)
     {
-        addFace(face);
+        addFace(face, prev);
     }
+    handleBoundaryVertices(prev);
 }
 
 Face triangle_to_face(IVec3 &tri)
@@ -232,10 +266,12 @@ void MeshHalfEdge::buildHalfEdgeStructure(IVec3Span triangles)
     initArray();
     // convert to faces
     // Face face;
+    IntList prev;
     for (auto &tri : triangles)
     {
-        addFace(triangle_to_face(tri));
+        addFace(triangle_to_face(tri), prev);
     }
+    handleBoundaryVertices(prev);
     // buildHalfEdgeStructure(faces);
 }
 
@@ -349,9 +385,7 @@ void MeshHalfEdge::sanity_check()
         {
             std::cerr << "ERROR: Half-edge " << h << " has an invalid PAIR  pointer!" << std::endl;
         }
-
-        // Check mutual PAIR
-        if (halfEdge[pair][PAIR] != h)
+        else if (halfEdge[pair][PAIR] != h)
         // if (pair != -1 && halfEdge[pair][PAIR] != h)
         {
             std::cerr << "ERROR: Half-edge " << h << " and its pair " << pair << " are not mutual pairs!" << std::endl;
@@ -436,7 +470,7 @@ void MeshHalfEdge::computeVertexNormals()
     int u, w;
     for (int v = 0; v < vertexPos.size(); v++)
     {
-        std::cout << "Recomputing normals for vertex" << v << std::endl;
+        // std::cerr << "Recomputing normals for vertex" << v << std::endl;
 
         Vec3 normal = {0.0f, 0.0f, 0.0f};
         h = vertexHalfEdge[v];
@@ -447,30 +481,40 @@ void MeshHalfEdge::computeVertexNormals()
         count = 0;
         do
         {
+            // assert(halfEdge[h]!=)
+            // printerr("-------------------");
             u = halfEdge[h][HEAD];
+            // printerr("CURRENT HALF EDGE : ", h, "u = ", u);
             h = halfEdge[h][PAIR];
+            // printerr("CURRENT HALF EDGE after pair : ", h);
+            // printerr("CURRENT HALF EDGE : ", h);
 
-            // ignore boundary meshes for now
-            if (h == -1)
-            {
-                print("BOUNDARY MANIFOLD");
-                break;
-            }
+            // assert(h != -1);
 
             assert(halfEdge[h][HEAD] == v);
 
             // if (count > 8)
             // {
             //     print("INFINITE LOOP ERROR");
+            //     printerr("INFINITE LOOP ERROR");
             //     break;
             // }
-            count++;
+            // count++;
+            if (halfEdge[h][NEXT] == -1)
+            {
+                // Must be a boundary edge, so LEFT and NEXT both must be 0
+                assert(halfEdge[h][LEFT] == -1);
+                // printerr("This is a boundary edge:", h);
+                break;
+            }
 
             h = halfEdge[h][NEXT];
+
             w = halfEdge[h][HEAD];
+            // printerr("CURRENT HALF EDGE after next : ", h, "W = ", w);
 
             normal = normal + computeFaceNormal(u, v, w);
-            print(u, "->", v, "->", w);
+            // print(u, "->", v, "->", w);
         } while (h != start);
         vertexNormal[v] = glm::normalize(normal);
         // vertexNormal[v] = normal / (float)count;
@@ -501,7 +545,6 @@ void MeshHalfEdge::smoothen_step(float λ)
         count = 0;
         start = vertexHalfEdge[v];
         h = start;
-        int loop_guard = 10; // Prevent infinite loops
         do
         {
             count++;
@@ -510,12 +553,14 @@ void MeshHalfEdge::smoothen_step(float λ)
             v1 = halfEdge[h][HEAD];
             sum = sum + vertexPos[v1];
             h = halfEdge[h][PAIR];
-            h = halfEdge[h][NEXT];
-            if (loop_guard-- == 0)
+            if (halfEdge[h][NEXT] == -1)
             {
-                std::cerr << "Error: Possible infinite loop detected in Laplacian smoothing!" << std::endl;
+                // Must be a boundary edge, so LEFT and NEXT both must be 0
+                assert(halfEdge[h][LEFT] == -1);
+                // printerr("This is a boundary edge:", h);
                 break;
             }
+            h = halfEdge[h][NEXT];
 
         } while (h != start);
 

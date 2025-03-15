@@ -67,6 +67,7 @@ enum HalfEdgeIndices
     LEFT
 };
 
+using IntMap = std::unordered_map<int, int>;
 using Key = uint64_t;
 using EdgeMap = std::unordered_map<Key, int>;
 
@@ -114,7 +115,7 @@ public:
     VecList faceVertices; // Explicit face indices for rendering
 
     // part1
-    void addFace(const Face &face);
+    void addFace(const Face &face, IntList &prev);
     void buildHalfEdgeStructure(IVec3Span triangles);
     void triangulateFace(int faceIdx);
 
@@ -129,10 +130,10 @@ public:
     void debugInfo()
     {
 
-        std::cout << " | Vertices " << vertexPos.size() << " | triangles " << triangleVertices.size() << " | Edges " << edges.size() << std::endl;
+        std::cerr << " | Vertices " << vertexPos.size() << " | triangles " << triangleVertices.size() << " | Edges " << edges.size() << std::endl;
 
         // Print vertex index, position, and normal on the same line
-        std::cout << "Vertices" << std::endl;
+        std::cerr << "Vertices" << std::endl;
         for (size_t idx = 0; idx < vertexPos.size(); idx++)
         {
             std::cout << idx << ": (" << vertexPos[idx].x << ", " << vertexPos[idx].y << ", " << vertexPos[idx].z << ")"
@@ -141,7 +142,7 @@ public:
         }
 
         // Print face index, vertex indices, and face normal
-        std::cout << "Faces" << std::endl;
+        std::cerr << "Faces" << std::endl;
         for (size_t idx = 0; idx < triangleVertices.size(); idx++)
         {
             std::cout << idx << ": [" << triangleVertices[idx].x << ", " << triangleVertices[idx].y << ", " << triangleVertices[idx].z << "]"
@@ -191,24 +192,24 @@ public:
 
         int h;
         int f;
-        {
-            int v = 7;
-            h = vertexHalfEdge[v];
-            // h = halfEdge[h][PAIR];
-            // HalfEdge *h = v->halfEdge;
-            print("Face traversal from vertex", v);
-            do
-            {
+        // {
+        //     int v = 7;
+        //     h = vertexHalfEdge[v];
+        //     // h = halfEdge[h][PAIR];
+        //     // HalfEdge *h = v->halfEdge;
+        //     printerr("Face traversal from vertex", v);
+        //     do
+        //     {
 
-                // do something with h->left;
-                f = halfEdge[h][LEFT];
-                print("he ", h, "Face ", f);
-                h = halfEdge[h][NEXT];
-                // print("Next he ", h, "Face ", f, "head ", halfEdge[h][HEAD];);
-                h = halfEdge[h][PAIR];
+        //         // do something with h->left;
+        //         f = halfEdge[h][LEFT];
+        //         print("he ", h, "Face ", f);
+        //         h = halfEdge[h][NEXT];
+        //         // print("Next he ", h, "Face ", f, "head ", halfEdge[h][HEAD];);
+        //         h = halfEdge[h][PAIR];
 
-            } while (h != vertexHalfEdge[v]);
-        }
+        //     } while (h != vertexHalfEdge[v]);
+        // }
         // for (int i = 0; i < vertexHalfEdge.size(); i++)
         // {
         //     h = vertexHalfEdge[i];
@@ -216,22 +217,22 @@ public:
         // }
 
         // for (auto &i : halfEdge)
-        print("Half edges : \nPAIR NEXT HEAD LEFT");
+        printerr("Half edges : \nPAIR NEXT HEAD LEFT");
         for (int h = 0; h < halfEdge.size(); h++)
         {
             auto i = halfEdge[h];
-            if (h == 21 | h == 8 | h == 7)
-                std::cout << h << ":" << i[0] << " " << i[1] << " " << i[2] << " " << i[3] << std::endl;
-            if (i[0] == -1)
-            {
-                std::cout << "ERROR " << std::endl;
-                flag = 0;
-                break;
-            }
+            // if (h == 21 | h == 8 | h == 7)
+            std::cerr << h << ":" << i[0] << " " << i[1] << " " << i[2] << " " << i[3] << std::endl;
+            // if (i[0] == -1)
+            // {
+            //     std::cerr << "ERROR " << std::endl;
+            //     flag = 0;
+            //     break;
+            // }
             // if (h==)
         }
-        if (flag)
-            std::cout << "All half edge have pair" << std::endl;
+        // if (flag)
+        //     std::cout << "All half edge have pair" << std::endl;
         // std::cout << "Edges" << std::endl;
         // for (auto &i : edges)
         // {
@@ -243,7 +244,7 @@ public:
         //     std::cout << i.x << " " << i.y << " " << i.z << std::endl;
         // }
     }
-
+    void handleBoundaryVertices(IntList &prev);
     void triangulateMesh()
     {
         int numFaces = FaceHalfEdge.size();
