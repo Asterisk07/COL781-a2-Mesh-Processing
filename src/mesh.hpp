@@ -300,9 +300,19 @@ public:
         std::cout << "Standard Deviation: " << stddev << std::endl;
     }
 
+    // part 6
     void extrudeFace(int faceidx, float multiplier = 1.0f);
 
+    // part 5
+
     void addNoise(const std::string &noiseType, float param);
+
+    // part 8
+
+    void extrudeVertex(int v, float factor = 1.0f);
+    void extrudeNeighbors(int v, float factor = 1.0f);
+    void flatten(int v);
+    void planarizeNeighbors(int v);
 };
 // void findBoundaryEdges();
 // // void extractEdgesFromFaces();
@@ -310,7 +320,7 @@ public:
 // // part2
 void generateCustomGrid(int m, int n, float a, int axis, const std::string &filename);
 void generateGrid(int m, int n, const std::string &filename);
-void generateSphere(int m, int n, const std::string &filename);
+void generateSphere(int m, int n, const std::string &filename, int axis = 2, int direction = 1);
 void generateCube(int m, int n, int o, const std::string &filename);
 
 // // part3

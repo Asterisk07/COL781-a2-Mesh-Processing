@@ -1180,9 +1180,12 @@ void generateGrid(int m, int n, const std::string &filename)
 
 // void pushSphereFace(FaceList &faces, )
 
-void generateSphere(int m, int n, const std::string &filename)
+void generateSphere(int m, int n, const std::string &filename, int axis, int direction)
 
 {
+    // axis : 0 for x and 2 for z
+    assert(axis <= 2);
+    assert(axis >= 0);
     std::vector<Vec3> vertices;
     std::vector<Vec3> normals;
     std::vector<std::vector<int>> faces;
@@ -1199,8 +1202,11 @@ void generateSphere(int m, int n, const std::string &filename)
         faces.push_back(face);
     };
 
-    vertices.push_back({0, 0, 1}); // Top pole
-    normals.push_back({0, 0, 1});
+    Vec3 vec = {0.0f, 0.0f, 0.0f};
+    // vec[axis] = 1;
+    vec[axis] = direction;
+    vertices.push_back(vec); // Top pole
+    normals.push_back(vec);
 
     for (int i = 1; i < n; i++)
     {
@@ -1211,13 +1217,27 @@ void generateSphere(int m, int n, const std::string &filename)
             float x = sin(phi) * cos(theta);
             float y = sin(phi) * sin(theta);
             float z = cos(phi);
-            vertices.push_back({x, y, z});
-            normals.push_back({x, y, z});
+            // vertices.push_back({x, y, z});
+            // normals.push_back({x, y, z});
+            glm::vec3 v;
+            if (axis == 0)
+                v = {z, y, x}; // Swap X and Z
+            else if (axis == 1)
+                v = {x, z, y}; // Swap Y and Z
+            else
+                v = {x, y, z}; // Default (Z-axis)
+            v[axis] = v[axis] * direction;
+
+            vertices.push_back(v);
+            normals.push_back(glm::normalize(v));
         }
     }
 
-    vertices.push_back({0, 0, -1}); // Bottom pole
-    normals.push_back({0, 0, -1});
+    vec[axis] = -vec[axis];
+    // vec[axis] = vec[axis] * direction;
+
+    vertices.push_back(vec); // Bottom pole
+    normals.push_back(vec);
 
     for (int j = 0; j < m; j++)
     {
@@ -1293,6 +1313,75 @@ void MeshHalfEdge::addNoise(const std::string &noiseType, float param)
     {
         v += getRandomDisplacement(noiseType, param);
     }
+}
+
+// Part 8
+void MeshHalfEdge::extrudeVertex(int v, float factor)
+{
+    if (v == -1)
+        v = vertexPos.size() - 1;
+    vertexPos[v] = vertexPos[v] + vertexNormal[v] * factor;
+}
+
+void MeshHalfEdge::extrudeNeighbors(int v, float factor)
+{
+
+    if (v == -1)
+        v = vertexPos.size() - 1;
+
+    for (int h = 0; h < halfEdge.size(); h++)
+    {
+        if (halfEdge[h][HEAD] != v)
+            continue;
+        int pair = halfEdge[h][PAIR];
+        int u = halfEdge[pair][HEAD];
+        // use normal of v to extrude its neoughbour u
+        vertexPos[u] = vertexPos[u] + vertexNormal[v] * factor;
+    }
+}
+
+void MeshHalfEdge::planarizeNeighbors(int v)
+{
+    // pull neighbours up along normal of v , aligning them along normal
+
+    if (v == -1)
+        v = vertexPos.size() - 1;
+
+    auto normal = vertexNormal[v];
+
+    for (int h = 0; h < halfEdge.size(); h++)
+    {
+        if (halfEdge[h][HEAD] != v)
+            continue;
+        int pair = halfEdge[h][PAIR];
+        int u = halfEdge[pair][HEAD];
+        // use normal of v to extrude its neoughbour u
+        float factor = glm::dot(vertexPos[v] - vertexPos[u], normal);
+        vertexPos[u] = vertexPos[u] + normal * factor;
+    }
+}
+
+void MeshHalfEdge::flatten(int v)
+{
+
+    if (v == -1)
+        v = vertexPos.size() - 1;
+
+    int count = 0;
+    Vec3 pos = {0.0f, 0.0f, 0.0f};
+    for (int h = 0; h < halfEdge.size(); h++)
+    {
+        if (halfEdge[h][HEAD] != v)
+            continue;
+        int pair = halfEdge[h][PAIR];
+        int u = halfEdge[pair][HEAD];
+        // use normal of v to extrude its neoughbour u
+        pos = pos + vertexPos[u];
+        count++;
+        // vertexPos[u] = vertexPos[u] + vertexNormal[v] * factor;
+    }
+    pos = pos / (float)count;
+    vertexPos[v] = pos;
 }
 
 // void generateCube(int m, int n, int o, const std::string &filename)
