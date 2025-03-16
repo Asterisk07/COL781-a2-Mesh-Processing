@@ -39,15 +39,15 @@ int main()
     // const std::string filename = "meshes/cube.obj";
     // const std::string filename = "meshes/cube.obj";
     // const std::string filename = "meshes/try_tri.obj";
-    // const std::string filename = "meshes/try_new.obj";
+    const std::string filename = "meshes/try_new.obj";
     // const std::string filename = "meshes/try_square.obj";
     // const std::string filename = "meshes/try_pyramid.obj";
     // const std::string filename = "meshes/spot_control_mesh.obj";
     // const std::string filename = "meshes/bunny_1k.obj";
-    const std::string filename = "meshes/try_spot.obj";
+    // const std::string filename = "meshes/try_spot.obj";
     // generateGrid(3, 3, filename);
     // generateCustomGrid(4, 2, -1, 1, filename);
-    // generateSphere(7, 9, filename);
+    generateSphere(7, 9, filename);
     // generateCube(2, 3, 4, filename);
     // generateCube(3, 3, 3, filename);
     // generateCube(4, 2, 5, filename);
@@ -61,9 +61,9 @@ int main()
     // Build half-edge structure
     mesh.buildHalfEdgeStructure(faces);
     // Extrude cube
-    // for (int i = 0; i < 6; i++)
+    // for (int i = 0; i < 4; i++)
     // {
-    //     mesh.extrudeFace(i * 9 + 4, 0.3);
+    //     mesh.extrudeFace(i * 3 + 4, 0.3);
     // }
 
     mesh.sanity_check();
@@ -71,14 +71,16 @@ int main()
     // mesh.debugInfo();
 
     std::cerr << "Here" << std::endl;
-    mesh.triangulateMesh();
+    IVec3List triangleVertices; // Explicit triangle indices for rendering
+    EdgeList edges;             // Explicit triangle edges for rendering
+    mesh.triangulateMesh(triangleVertices, edges);
     std::cerr << "Here 2\n";
     // restoreStdout();
     // mesh.smoothen(0.8, 4);
-    // mesh.computeEdgeStats();
+    // mesh.computeEdgeStats(edges);
     // mesh.smoothen_taubin(0.4, -0.2, 50);
     // mesh.smoothen_laplacian(0.4, 50);
-    // mesh.smoothen_laplacian(0.2, 5);
+    // mesh.smoothen_laplacian(0.1, 53);
     // mesh.computeEdgeStats();
     // mesh.debugInfo();
     mesh.computeVertexNormals();
@@ -94,8 +96,8 @@ int main()
 
     // Set mesh data
     // mesh.debugInfo();
-    v.setMesh(mesh.vertexPos.size(), mesh.triangleVertices.size(), mesh.edges.size(),
-              mesh.vertexPos.data(), mesh.triangleVertices.data(), mesh.edges.data(), mesh.vertexNormal.data());
+    v.setMesh(mesh.vertexPos.size(), triangleVertices.size(), edges.size(),
+              mesh.vertexPos.data(), triangleVertices.data(), edges.data(), mesh.vertexNormal.data());
 
     v.view();
 }

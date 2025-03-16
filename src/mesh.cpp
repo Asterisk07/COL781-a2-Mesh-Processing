@@ -363,7 +363,7 @@ void print()
 {
 }
 
-void MeshHalfEdge::triangulateFace(int faceIdx)
+void MeshHalfEdge::triangulateFace(int faceIdx, IVec3List &triangleVertices, EdgeList &edges)
 {
     // triangulates face and adds triangle to triangleVertices
     // int h = FaceHalfEdge[faceIdx];

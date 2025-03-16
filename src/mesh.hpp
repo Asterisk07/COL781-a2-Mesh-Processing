@@ -105,18 +105,18 @@ public:
     // Vec3List faceNormals;  // m x 3 face normals
     HalfEdgeList halfEdge; // e x 4 (PAIR, NEXT, HEAD, LEFT)
 
-    IntList vertexHalfEdge;     // Maps vertex index → one outgoing half-edge
-    IntList FaceHalfEdge;       // Maps face index → one half-edge
-    EdgeMap halfedgeMap;        // Edge lookup table
-    IVec3List triangleVertices; // Explicit triangle indices for rendering
-    EdgeList edges;             // Explicit triangle edges for rendering
+    IntList vertexHalfEdge; // Maps vertex index → one outgoing half-edge
+    IntList FaceHalfEdge;   // Maps face index → one half-edge
+    EdgeMap halfedgeMap;    // Edge lookup table
+    // IVec3List triangleVertices; // Explicit triangle indices for rendering
+    // EdgeList edges;             // Explicit triangle edges for rendering
     // EdgeSpan edges;             // Explicit triangle edges for rendering
     // VecList faceVertices; // Explicit face indices for rendering
 
     // part1
     void addFace(const Face &face, IntList &prev);
     void buildHalfEdgeStructure(IVec3Span triangles);
-    void triangulateFace(int faceIdx);
+    void triangulateFace(int faceIdx, IVec3List &triangleVertices, EdgeList &edges);
 
     // void  resize(int n);
     void buildHalfEdgeStructure(VecList &faces);
@@ -126,7 +126,7 @@ public:
     }
 
     void sanity_check();
-    void debugInfo()
+    void debugInfo(IVec3List &triangleVertices, EdgeList &edges)
     {
 
         std::cerr << " | Vertices " << vertexPos.size() << " | triangles " << triangleVertices.size() << " | Edges " << edges.size() << std::endl;
@@ -252,12 +252,12 @@ public:
         // }
     }
     void handleBoundaryVertices(IntList &prev);
-    void triangulateMesh()
+    void triangulateMesh(IVec3List &triangleVertices, EdgeList &edges)
     {
         int numFaces = FaceHalfEdge.size();
-        for (int i = 0; i < numFaces; i++)
+        for (int faceidx = 0; faceidx < numFaces; faceidx++)
         {
-            triangulateFace(i);
+            triangulateFace(faceidx, triangleVertices, edges);
         }
     }
 
@@ -279,7 +279,7 @@ public:
     void smoothen_taubin(float λ, float u, int iterations);
     void smoothen_step(float λ);
 
-    void computeEdgeStats()
+    void computeEdgeStats(EdgeList &edges)
     {
         std::vector<double> lengths;
         double sum = 0.0, sumSq = 0.0;
