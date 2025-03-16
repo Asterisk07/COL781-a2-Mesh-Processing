@@ -301,6 +301,8 @@ public:
     }
 
     void extrudeFace(int faceidx, float multiplier = 1.0f);
+
+    void addNoise(const std::string &noiseType, float param);
 };
 // void findBoundaryEdges();
 // // void extractEdgesFromFaces();

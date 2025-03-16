@@ -62,10 +62,10 @@ int main()
     // Build half-edge structure
     mesh.buildHalfEdgeStructure(faces);
     // Extrude cube
-    for (int i = 0; i < 6; i++)
-    {
-        mesh.extrudeFace(i * 9 + 4, 0.3);
-    }
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     mesh.extrudeFace(i * 3 + 4, 0.3);
+    // }
 
     mesh.sanity_check();
     std::cerr << "Here 0" << std::endl;
@@ -76,6 +76,16 @@ int main()
     EdgeList edges;             // Explicit triangle edges for rendering
     mesh.triangulateMesh(triangleVertices, edges);
     std::cerr << "Here 2\n";
+    // restoreStdout();
+    // mesh.smoothen(0.8, 4);
+    // mesh.computeEdgeStats(edges);
+    // mesh.smoothen_taubin(0.4, -0.2, 50);
+    mesh.addNoise("gaussian", 0.05);
+    // mesh.smoothen_laplacian(0.2, 8); // tk uncomment to smoothen
+    // mesh.smoothen_laplacian(-0.2, 15);
+    // mesh.smoothen_laplacian(0.1, 53);
+    // mesh.computeEdgeStats();
+    // mesh.debugInfo();
     mesh.computeVertexNormals();
 
     /* ------------------------------------ ------------------------------------*/

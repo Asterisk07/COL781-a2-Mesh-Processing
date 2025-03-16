@@ -625,7 +625,7 @@ void MeshHalfEdge::smoothen_step(float λ)
         Vec3 sum = Vec3(0.0f);
 
         count = 0;
-        start = vertexHalfEdge[v];
+        start = vertexHalfEdge[v]; // outgoing half edge
         h = start;
         do
         {
@@ -646,8 +646,10 @@ void MeshHalfEdge::smoothen_step(float λ)
 
         } while (h != start);
 
-        if (count == 0.0f)
-            continue;
+        assert(count > 0);
+
+        // if (count == 0.0f)
+        //     continue;
         if (false)
         {
             print("count is", count);
@@ -664,10 +666,6 @@ void MeshHalfEdge::smoothen_taubin(float λ, float u, int iterations)
     // taubin
     // traverse all vertices adjacent to a given vertex
     // Vec3 sum(0.0f, 0.0f, 0.0f);
-    assert(λ >= 0);
-    assert(λ <= 1);
-    assert(u >= -11);
-    assert(u <= 0);
 
     for (int iter = 0; iter < iterations; iter++)
     {
@@ -1260,6 +1258,41 @@ void generateSphere(int m, int n, const std::string &filename)
     }
 
     saveOBJ(filename, vertices, normals, faces);
+}
+
+#include <glm/glm.hpp>
+#include <random>
+#include <string>
+
+// Function to generate a random displacement vector (Gaussian or Uniform)
+glm::vec3 getRandomDisplacement(const std::string &noiseType, float param)
+{
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    if (noiseType == "gaussian")
+    {
+        std::normal_distribution<float> dist(0.0f, param); // Mean = 0, Std dev = sigma
+        return glm::vec3(dist(gen), dist(gen), dist(gen));
+    }
+    else if (noiseType == "uniform")
+    {
+        std::uniform_real_distribution<float> dist(-param, param); // Range [-param, param]
+        return glm::vec3(dist(gen), dist(gen), dist(gen));
+    }
+    else
+    {
+        throw std::invalid_argument("Invalid noise type! Use 'gaussian' or 'uniform'.");
+    }
+}
+
+// Apply noise to all vertices in the mesh
+void MeshHalfEdge::addNoise(const std::string &noiseType, float param)
+{
+    for (glm::vec3 &v : vertexPos)
+    {
+        v += getRandomDisplacement(noiseType, param);
+    }
 }
 
 // void generateCube(int m, int n, int o, const std::string &filename)
