@@ -47,10 +47,12 @@ int main()
     // const std::string filename = "meshes/try_spot.obj";
     // generateGrid(3, 3, filename);
     // generateCustomGrid(4, 2, -1, 1, filename);
-    int m = 7, n = 9;
+    // int m = 3, n = 4;
+    int m = 12, n = 15;
+    // int m = 7, n = 9; //current best
     // int m = 6, n = 6;
-    int axis = 1; // y axis
-    int direction = -1;
+    int axis = 1, direction = -1; // final
+    // int axis = 2, direction = 1; // debugging
     generateSphere(m, n, filename, axis, direction);
 
     // generateSphere(7, 9, filename);
@@ -67,6 +69,7 @@ int main()
 
     // Build half-edge structure
     mesh.buildHalfEdgeStructure(faces);
+    int V = mesh.vertexPos.size();
 
     // Extrude cube
     // for (int i = 0; i < 4; i++)
@@ -75,30 +78,50 @@ int main()
     // }
 
     mesh.sanity_check();
-    std::cerr << "Here 0" << std::endl;
     // mesh.debugInfo();
 
-    std::cerr << "Here" << std::endl;
+    //
+    // mesh.extrudeCopyNeighbors(-1, 1);
+
     IVec3List triangleVertices; // Explicit triangle indices for rendering
     EdgeList edges;             // Explicit triangle edges for rendering
-    mesh.triangulateMesh(triangleVertices, edges);
-    std::cerr << "Here 2\n";
+
     // restoreStdout();
     // mesh.smoothen(0.8, 4);
     // mesh.computeEdgeStats(edges);
     // mesh.smoothen_taubin(0.4, -0.2, 50);
     // mesh.addNoise("gaussian", 0.05);
     // mesh.smoothen_laplacian(0.2, 8); // tk uncomment to smoothen
-    mesh.smoothen_laplacian(-0.2, 15); // tk uncomment to smoothen
     // mesh.smoothen_laplacian(-0.1, 10);
     // mesh.extrudeVertex(0);
-    mesh.extrudeVertex(-1, -0.5);
-    mesh.extrudeVertex(0, 0.5);
-    mesh.extrudeNeighbors(0, 0.5);
-    // mesh.flatten(-1);
-    mesh.planarizeNeighbors(-1);
-    // mesh.extrudeVertex(-1, -0.5);
-    // mesh.smoothen_laplacian(0.1, 10); // tk uncomment to smoothen
+    // mesh.extrudeVertex(V - 1, 1);
+    if (true)
+
+    {
+
+        std::cerr << "Here 0" << std::endl;
+        mesh.smoothen_laplacian(-0.2, 15);
+        mesh.extrudeVertex(V - 1, -0.25);
+        mesh.extrudeVertex(0, 0.4);
+        std::cerr << "Here 1\n";
+
+        mesh.extrudeNeighbors(0, 0.4);
+        std::cerr << "Here 2\n";
+
+        mesh.flatten(V - 1);
+        std::cerr << "Here 3" << std::endl;
+
+        mesh.extrudeVertex(V - 1, 0.15);
+        std::cerr << "Here 4" << std::endl;
+
+        mesh.extrudeCopyNeighbors(V - 1, 0.15);
+    }
+    std::cerr << "Here 5" << std::endl;
+    mesh.triangulateMesh(triangleVertices, edges);
+    std::cerr << "Here 6" << std::endl;
+    mesh.smoothen_laplacian(0.2, 3, V / 2);
+    std::cerr << "Here 7" << std::endl;
+    mesh.extrudeVertex(0, 0.1);
 
     // mesh.computeVertexNormals();
 
@@ -112,7 +135,7 @@ int main()
     }
 
     // Set mesh data
-    // mesh.debugInfo();
+    // mesh.debugInfo(triangleVertices, edges);
     v.setMesh(mesh.vertexPos.size(), triangleVertices.size(), edges.size(),
               mesh.vertexPos.data(), triangleVertices.data(), edges.data(), mesh.vertexNormal.data());
 
