@@ -159,19 +159,32 @@ public:
     }
 
     // part 6
+    // Extrudes a face outward by duplicating its vertices and adjusting connectivity.
     void extrudeFace(int faceidx, float multiplier = 1.0f);
 
     // part 8
 
+    // (Only Geometrical) Moves a single vertex along its normal direction.
     void extrudeVertex(int v, float factor = 1.0f);
+
+    // (Only Geometrical) Moves all neighboring vertices of `v` outward along `v`'s normal.
     void extrudeNeighbors(int v, float factor = 1.0f);
+
+    // Duplicates and extrudes the neighbors of `v`, creating a new shell around `v`.
     void extrudeCopyNeighbors(int v, float factor = 1.0f);
+
+    // (Only Geometrical) Moves `v` to the average position of its neighbors to create a local flattening effect.
     void flatten(int v);
+
+    // (Only Geometrical) Adjusts neighboring vertices of `v` to lie on a plane perpendicular to its normal.
     void planarizeNeighbors(int v);
 };
 
 // // part2
+
+// Grid along any axis at position X=a or Z=a etc
 void generateCustomGrid(int m, int n, float a, int axis, const std::string &filename);
+
 void generateGrid(int m, int n, const std::string &filename);
 void generateSphere(int m, int n, const std::string &filename, int axis = 2, int direction = 1);
 void generateCube(int m, int n, int o, const std::string &filename);

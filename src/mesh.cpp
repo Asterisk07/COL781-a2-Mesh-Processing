@@ -57,7 +57,6 @@ void MeshHalfEdge::addFace(const Face &face, IntList &prev)
 
     halfEdge.resize(m + n, {-1, -1, -1, -1}); // Resize for new half-edges
     prev.resize(m + n, -1);                   // Resize for new half-edges
-    // vertexHalfEdge.resize(vertexHalfEdge.size()+)
     int vertex;
     int nextVertex;
     int pair;
@@ -69,7 +68,7 @@ void MeshHalfEdge::addFace(const Face &face, IntList &prev)
         h = m + i;
         vertex = face[i];
         nextVertex = face[(i + 1) % n];
-        std::cout << "vertex is " << vertex << std::endl;
+        // std::cout << "vertex is " << vertex << std::endl;
         assert(vertex < vertexHalfEdge.size());
         assert(nextVertex < vertexHalfEdge.size());
         // std::cerr << "setting half edge for vertex" << vertex << "to " << h << std::endl;
@@ -84,8 +83,7 @@ void MeshHalfEdge::addFace(const Face &face, IntList &prev)
 
         if (halfedgeMap.find(key) != halfedgeMap.end())
         {
-            print("Found key ", key, "For vertices", nextVertex, vertex);
-            // print("")
+            ////print("Found key ", key, "For vertices", nextVertex, vertex);
             pair = halfedgeMap[key];
             halfEdge[h][PAIR] = pair;
             halfEdge[pair][PAIR] = h;
@@ -94,7 +92,7 @@ void MeshHalfEdge::addFace(const Face &face, IntList &prev)
         {
             key = enkey(vertex, nextVertex);
 
-            print("Added key ", key, "For vertices", vertex, nextVertex);
+            ////print("Added key ", key, "For vertices", vertex, nextVertex);
             halfedgeMap[key] = h;
         }
 
@@ -104,30 +102,6 @@ void MeshHalfEdge::addFace(const Face &face, IntList &prev)
 
         halfEdge[h][LEFT] = faceIdx;
         halfEdge[h][HEAD] = nextVertex;
-    }
-    int flag = 1;
-    for (int i = 0; i < n; i++)
-    {
-        int v = face[i];
-        // if (v == 13)
-        // {
-        //     std::cerr << "Assigned half edges to " << v << "as" << vertexHalfEdge[v] << std::endl;
-        // }
-        if (vertexHalfEdge[v] == -1)
-        {
-            flag = 0;
-            std::cerr << "ERROR HALF EDGE NOT SET FOR " << v << std::endl;
-        }
-        // if (vertexHalfEdge[v] == -1) {
-        //     std::cerr << "ERROR: Vertex " << v << " is not connected to any half-edge!" << std::endl;
-        // }
-    }
-    if (flag)
-    {
-        // std::cerr << "All these vertices have half edges :";
-        // for (auto i : face)
-        //     std::cerr << i << " , ";
-        // std::cerr << std::endl;
     }
 };
 
@@ -181,17 +155,17 @@ void MeshHalfEdge::triangulateFace(int faceIdx, IVec3List &triangleVertices, Edg
     // triangulates face and adds triangle to triangleVertices
     // int h = FaceHalfEdge[faceIdx];
     // HalfEdge h =
-    print("Triangulate Face called");
+    // print("Triangulate Face called");
     HalfEdge h;
 
     h = halfEdge[FaceHalfEdge[faceIdx]];
 
     int x = -1, y = -1, z = -1;
     x = h[HEAD];
-    print("currently h[HEAD] = ", h[HEAD]);
+    // print("currently h[HEAD] = ", h[HEAD]);
 
     h = halfEdge[h[NEXT]];
-    print("x,y,z", x, y, z);
+    // print("x,y,z", x, y, z);
 
     while (h[HEAD] != x)
     {
@@ -199,13 +173,13 @@ void MeshHalfEdge::triangulateFace(int faceIdx, IVec3List &triangleVertices, Edg
         if (y == -1)
         {
             edges.push_back(Edge(x, z));
-            print("Added edge 1 : ", x, "->", z);
+            // print("Added edge 1 : ", x, "->", z);
         }
         else
         {
             // edges.push_back({y, z});
             edges.push_back(Edge(y, z));
-            print("Added edge 2 : ", y, "->", z);
+            // print("Added edge 2 : ", y, "->", z);
 
             IVec3 tri(x, y, z);
             // IVec3(x, y, z)
@@ -216,11 +190,11 @@ void MeshHalfEdge::triangulateFace(int faceIdx, IVec3List &triangleVertices, Edg
 
         y = z;
         h = halfEdge[h[NEXT]];
-        print("x,y,z", x, y, z);
+        // print("x,y,z", x, y, z);
     }
 
     edges.push_back(Edge(z, x));
-    print("Added edge 2 : ", z, "->", x);
+    // print("Added edge 2 : ", z, "->", x);
 }
 
 void MeshHalfEdge::triangulateMesh(IVec3List &triangleVertices, EdgeList &edges)
@@ -234,7 +208,7 @@ void MeshHalfEdge::triangulateMesh(IVec3List &triangleVertices, EdgeList &edges)
 
 void MeshHalfEdge::sanity_check()
 {
-    std::cout << "Running Half-Edge Sanity Check..." << std::endl;
+    // std::cout << "Running Half-Edge Sanity Check..." << std::endl;
 
     for (int h = 0; h < halfEdge.size(); h++)
     {
@@ -273,7 +247,7 @@ void MeshHalfEdge::sanity_check()
         }
     }
 
-    std::cout << "Checking vertex connectivity..." << std::endl;
+    // std::cout << "Checking vertex connectivity..." << std::endl;
 
     for (int v = 0; v < vertexPos.size(); v++)
     {
@@ -287,43 +261,10 @@ void MeshHalfEdge::sanity_check()
         int start = h;
         int count = 0;
 
-        // std::cout << "Neighbors of vertex " << v << ": ";
-
-        // do
-        // {
-        //     if (h == -1)
-        //     {
-        //         std::cerr << "ERROR: Null half-edge encountered at vertex " << v << "!" << std::endl;
-        //         break;
-        //     }
-
-        //     int neighbor = halfEdge[h][HEAD];
-        //     std::cout << neighbor << " ";
-
-        //     h = halfEdge[h][PAIR]; // Move to opposite half-edge
-
-        //     if (h == -1)
-        //     {
-        //         std::cerr << "ERROR: Boundary edge encountered at vertex " << v << "!" << std::endl;
-        //         break;
-        //     }
-
-        //     h = halfEdge[h][NEXT]; // Move to next outgoing edge
-
-        //     count++;
-
-        //     if (count > 20) // Detect infinite loop
-        //     {
-        //         std::cerr << "ERROR: Possible infinite loop at vertex " << v << "!" << std::endl;
-        //         break;
-        //     }
-
-        // } while (h != start); // Should complete the loop
-
-        std::cout << std::endl;
+        // std::cout << std::endl;
     }
 
-    std::cout << "Vertex neighbor check complete!" << std::endl;
+    // std::cout << "Vertex neighbor check complete!" << std::endl;
 
     std::cerr << "Sanity Check Complete!" << std::endl;
 }
@@ -419,22 +360,9 @@ void generateCube(int m, int n, int o, const std::string &filename)
     std::vector<std::vector<int>> faces;
 
     int total = (m + 1) * (n + 1) * (o + 1);
-    // std::map<std::tuple<int, int, int>, int> vertexMap; // Map to store unique surface vertices
+
+    // Map to store unique surface vertices
     IntList verticeMap(total, -1);
-    // ** Insert only SURFACE vertices **
-
-    // auto insertVertex = [&](int i, int j, int k) -> int
-    // {
-    //     std::tuple<int, int, int> key = {i, j, k};
-    //     if (vertexMap.count(key))
-    //         return vertexMap[key]; // Already exists
-
-    //     Vec3 vertex = {(float)i / m - 0.5f, (float)j / n - 0.5f, (float)k / o - 0.5f};
-    //     int index = vertices.size();
-    //     vertices.push_back(vertex);
-    //     vertexMap[key] = index;
-    //     return index;
-    // };
 
     auto setNormalForFace = [&](int i, int j, int k)
     {
@@ -467,19 +395,9 @@ void generateCube(int m, int n, int o, const std::string &filename)
         return verticeMap[x];
     };
 
-    // auto setNormal = [&](int idx, Vec3 normal)
-    // {
-
-    //         // normals[idx] = normal;
-    // };
-
     auto addFace = [&](int i1, int j1, int k1, int i2, int j2, int k2, int i3, int j3, int k3, int i4, int j4, int k4)
     {
         faces.push_back({getIndex(i1, j1, k1), getIndex(i2, j2, k2), getIndex(i3, j3, k3), getIndex(i4, j4, k4)});
-        // setNormalForFace(i1, j1, k1);
-        // setNormalForFace(i2, j2, k2);
-        // setNormalForFace(i3, j3, k3);
-        // setNormalForFace(i4, j4, k4);
     };
 
     // ** Z = 0 (Back Face, Normal (0, 0, -1)) **
@@ -512,28 +430,6 @@ void generateCube(int m, int n, int o, const std::string &filename)
         for (int k = 0; k < o; k++)
             addFace(i, n, k, i, n, k + 1, i + 1, n, k + 1, i + 1, n, k); // CCW
 
-    // Precompute unique normals for each vertex
-
-    // normals.resize(()).size(), {0, 0, 0});
-
-    // // Set normals for each face's vertices
-    // for (int i = 0; i <= m; i++)
-    //     for (int j = 0; j <= n; j++)
-    //         for (int k = 0; k <= o; k++)
-    //         {
-    //             if (i == 0)
-    //                 setNormal(i, j, k, {-1, 0, 0});
-    //             if (i == m)
-    //                 setNormal(i, j, k, {1, 0, 0});
-    //             if (j == 0)
-    //                 setNormal(i, j, k, {0, -1, 0});
-    //             if (j == n)
-    //                 setNormal(i, j, k, {0, 1, 0});
-    //             if (k == 0)
-    //                 setNormal(i, j, k, {0, 0, -1});
-    //             if (k == o)
-    //                 setNormal(i, j, k, {0, 0, 1});
-    //         }
     // std::cerr << "Vertices"<<filename
     printerr("Actual Vertices : ", vertices.size(), " | Normals : ", normals.size(), " | Faces : ", faces.size());
     int exp = 8 + 4 * (m - 1 + n - 1 + o - 1) + 2 * ((m - 1) * (n - 1) + (n - 1) * (o - 1) + (o - 1) * (m - 1));
@@ -550,11 +446,6 @@ void generateSphere(int m, int n, const std::string &filename, int axis, int dir
     std::vector<Vec3> vertices;
     std::vector<Vec3> normals;
     std::vector<std::vector<int>> faces;
-
-    // auto addFace = [&](int a, int b, int c)
-    // {
-    //     faces.push_back({a, b, c});
-    // };
 
     auto addFace = [&](std::initializer_list<int> indices)
     {
@@ -602,11 +493,7 @@ void generateSphere(int m, int n, const std::string &filename, int axis, int dir
 
     for (int j = 0; j < m; j++)
     {
-        // faces.push_back({(j + 1) % m + 1, j + 1, 0});
-        // faces.push_back({(j + 1) % m + 1, j + 1, 0});
         addFace({(j + 1) % m + 1, j + 1, 0});
-        // addFace((j + 1) % m + 1, j + 1, 0);
-        // faces.push_back({0, j + 1, (j + 1) % m + 1});
     }
 
     for (int i = 0; i < n - 2; i++)
@@ -622,20 +509,14 @@ void generateSphere(int m, int n, const std::string &filename, int axis, int dir
                 idx2 -= m;
                 idx4 -= m;
             }
-            // faces.push_back({idx1, idx2, idx4, idx3});
-            // addFace(idx1, idx2, idx4, idx3);
             addFace({idx1, idx2, idx4, idx3});
-            // faces.push_back({idx4, idx3, idx2, idx1});
         }
     }
 
     int last = vertices.size() - 1;
     for (int j = 0; j < m; j++)
     {
-        // addFace(last, last - m + j, last - m + (j + 1) % m);
         addFace({last, last - m + j, last - m + (j + 1) % m});
-        // faces.push_back({last, last - m + j, last - m + (j + 1) % m});
-        // faces.push_back({last - m + (j + 1) % m, last - m + j, last});
     }
 
     saveOBJ(filename, vertices, normals, faces);
@@ -647,10 +528,6 @@ void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
                                Vec3List &normals,
                                FaceList &faces)
 {
-    // Vec3List vertices;
-    // Vec2List texCoords;
-    // Vec3List normals;
-    // FaceList faces;
 
     std::ifstream file(filename);
     if (!file.is_open())
@@ -670,7 +547,7 @@ void MeshHalfEdge::loadObjfile(const std::string &filename, Vec3List &vertices,
         { // Vertex positions
             Vec3 v;
             iss >> v.x >> v.y >> v.z;
-            std::cout << "\tOne row of  vertices : " << v.x << " " << v.y << " " << v.z << std::endl;
+            // std::cout << "\tOne row of  vertices : " << v.x << " " << v.y << " " << v.z << std::endl;
             vertices.push_back(v);
         }
         else if (prefix == "vt")
@@ -725,7 +602,6 @@ Vec3 MeshHalfEdge::computeFaceNormal(int x, int y, int z)
     Vec3 edge2 = vertexPos[y] - vertexPos[x];
 
     Vec3 faceNormal = -glm::normalize(glm::cross(edge1, edge2));
-    // faceNormals.push_back(faceNormal);
     return faceNormal;
 }
 
@@ -749,25 +625,11 @@ void MeshHalfEdge::computeVertexNormals()
         count = 0;
         do
         {
-            // assert(halfEdge[h]!=)
-            // printerr("-------------------");
             u = halfEdge[h][HEAD];
-            // printerr("CURRENT HALF EDGE : ", h, "u = ", u);
             h = halfEdge[h][PAIR];
-            // printerr("CURRENT HALF EDGE after pair : ", h);
-            // printerr("CURRENT HALF EDGE : ", h);
-
-            // assert(h != -1);
 
             assert(halfEdge[h][HEAD] == v);
 
-            // if (count > 8)
-            // {
-            //     print("INFINITE LOOP ERROR");
-            //     printerr("INFINITE LOOP ERROR");
-            //     break;
-            // }
-            // count++;
             if (halfEdge[h][NEXT] == -1)
             {
                 // Must be a boundary edge, so LEFT and NEXT both must be 0
@@ -779,7 +641,6 @@ void MeshHalfEdge::computeVertexNormals()
             h = halfEdge[h][NEXT];
 
             w = halfEdge[h][HEAD];
-            // printerr("CURRENT HALF EDGE after next : ", h, "W = ", w);
 
             normal = normal + computeFaceNormal(u, v, w);
             // print(u, "->", v, "->", w);
@@ -843,9 +704,10 @@ void MeshHalfEdge::smoothen_step(float λ, int maxVertex)
         vertexPos[v] = vertexPos[v] + sum * λ;
     }
 }
+
 void MeshHalfEdge::smoothen_taubin(float λ, float u, int iterations, int maxVertex)
 {
-
+    // taubin
     for (int iter = 0; iter < iterations; iter++)
     {
         smoothen_step(λ, maxVertex);
@@ -855,9 +717,7 @@ void MeshHalfEdge::smoothen_taubin(float λ, float u, int iterations, int maxVer
 
 void MeshHalfEdge::smoothen_laplacian(float λ, int iterations, int maxVertex)
 {
-    // taubin
-    // traverse all vertices adjacent to a given vertex
-    // Vec3 sum(0.0f, 0.0f, 0.0f);
+
     smoothen_taubin(λ, 0.0f, iterations, maxVertex);
 }
 
@@ -948,7 +808,6 @@ void MeshHalfEdge::extrudeFace(int faceidx, float multiplier)
 
         Vec3 normal = {0.0f, 0.0f, 0.0f};
         normal = multiplier * computeFaceNormal(u, v, w);
-        // dupliacte vertices
 
         // extrude vertex
         vertexPos[V] = vertexPos[V] + normal;
@@ -1008,7 +867,6 @@ void MeshHalfEdge::extrudeCopyNeighbors(int v, float factor)
     IntList ring;
     do
     {
-        // ring.push_back(h);
         ring.push_back(halfEdge[h][NEXT]);
 
         h = halfEdge[h][NEXT];
@@ -1016,8 +874,6 @@ void MeshHalfEdge::extrudeCopyNeighbors(int v, float factor)
         h = halfEdge[h][PAIR];
     } while (h != start);
 
-    // halfEdge[h][PAIR]
-    // for (int h : ring){
     int next, pair, face;
     int first_next, V_old = vertexPos.size(), H_old = halfEdge.size();
     vertexHalfEdge[v] = H_old + 3;
@@ -1112,16 +968,11 @@ void MeshHalfEdge::flatten(int v)
     {
 
         printerr("Currently h = ", h);
-        // if (count > 10)
-        // {
-        //     printerr("ERROR");
-        //     break;
-        // }
         u = halfEdge[h][HEAD];
+
         // use normal of v to extrude its neoughbour u
         pos = pos + vertexPos[u];
         count++;
-        // vertexPos[u] = vertexPos[u] + vertexNormal[v] * factor;
         h = halfEdge[h][PAIR];
         h = halfEdge[h][NEXT];
     } while (h != start);

@@ -20,7 +20,7 @@ int main()
     const std::string filename = "meshes/try_new.obj";
 
     // generateGrid(3, 3, filename);
-    // generateSphere(7, 9, filename);
+    generateSphere(7, 9, filename);
     // generateCube(2, 3, 4, filename);
     // generateCube(3, 3, 3, filename);
     // generateCube(3, 3, 3, filename);
