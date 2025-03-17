@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <array>
 #include <sstream>
 
 #include <algorithm>
@@ -84,14 +85,14 @@ using HalfEdge = std::array<int, 4>;
 
 using Vec3List = std::vector<Vec3>;
 using Vec2List = std::vector<Vec2>;
-using Vec3Span = std::span<Vec3>;
+// using Vec3Span = std::span<Vec3>;
 using IVec3List = std::vector<IVec3>;
 using EdgeList = std::vector<Edge>;
-using EdgeSpan = std::span<Edge>;
+// using EdgeSpan = std::span<Edge>;
 using VecList = std::vector<Vec>;
 using HalfEdgeList = std::vector<HalfEdge>;
 
-using IVec3Span = std::span<IVec3>;
+// using IVec3Span = std::span<IVec3>;
 
 class MeshHalfEdge
 {
