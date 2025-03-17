@@ -1,0 +1,2 @@
+cmake -B build    # Create a fresh build folder
+cmake --build build  # Build
