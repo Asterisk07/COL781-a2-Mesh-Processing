@@ -9,7 +9,7 @@ using ivec3 = IVec3;
 int main()
 {
 
-        Vec3List vertices;
+    Vec3List vertices;
     Vec3List normals;
     FaceList faces;
 

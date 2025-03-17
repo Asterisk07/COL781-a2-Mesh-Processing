@@ -172,14 +172,16 @@ void MeshHalfEdge::triangulateFace(int faceIdx, IVec3List &triangleVertices, Edg
         z = h[HEAD];
         if (y == -1)
         {
-            edges.push_back(Edge(x, z));
-            // print("Added edge 1 : ", x, "->", z);
+            if (x < z)
+                edges.push_back(Edge(x, z));
+            // printerr("Added edge 1 : ", x, "->", z);
         }
         else
         {
             // edges.push_back({y, z});
-            edges.push_back(Edge(y, z));
-            // print("Added edge 2 : ", y, "->", z);
+            if (y < z)
+                edges.push_back(Edge(y, z));
+            // printerr("Added edge 2 : ", y, "->", z);
 
             IVec3 tri(x, y, z);
             // IVec3(x, y, z)
@@ -193,8 +195,9 @@ void MeshHalfEdge::triangulateFace(int faceIdx, IVec3List &triangleVertices, Edg
         // print("x,y,z", x, y, z);
     }
 
-    edges.push_back(Edge(z, x));
-    // print("Added edge 2 : ", z, "->", x);
+    if (z < x)
+        edges.push_back(Edge(z, x));
+    // printerr("Added edge 3 : ", z, "->", x);
 }
 
 void MeshHalfEdge::triangulateMesh(IVec3List &triangleVertices, EdgeList &edges)
@@ -215,11 +218,13 @@ void MeshHalfEdge::sanity_check()
         int next = halfEdge[h][NEXT];
         int pair = halfEdge[h][PAIR];
         int head = halfEdge[h][HEAD];
+        int face = halfEdge[h][LEFT];
 
         // Check valid NEXT pointer
         if (next == -1)
         {
-            std::cerr << "ERROR: Half-edge " << h << " has an invalid NEXT pointer!" << std::endl;
+            assert(face == -1);
+            // std::cerr << "BOUNDARY HALF : Half-edge " << h << " has an invalid NEXT pointer!" << std::endl;
         }
 
         if (pair == -1)
@@ -294,36 +299,36 @@ void generateGrid_helper(int m, int n, float a, int axis,
     else
         return; // Invalid axis, do nothing
 
-    for (int i = 0; i <= m; i++)
+    for (int j = 0; j <= n; j++)
     {
-        for (int j = 0; j <= n; j++)
+        for (int i = 0; i <= m; i++)
         {
             Vec3 vertex;
             if (axis == 0)
             { // x = a
-                vertex = {a, (float)i / m - 0.5f, (float)j / n - 0.5f};
+                vertex = {a, (float)j / n - 0.5f, (float)i / m - 0.5f};
             }
             else if (axis == 1)
             { // y = a
-                vertex = {(float)j / n - 0.5f, a, (float)i / m - 0.5f};
+                vertex = {(float)i / m - 0.5f, a, (float)j / n - 0.5f};
             }
             else if (axis == 2)
             { // z = a
-                vertex = {(float)i / m - 0.5f, (float)j / n - 0.5f, a};
-                // vertex = {(float)j / n - 0.5f, (float)i / m - 0.5f, a};
+                vertex = {(float)j / n - 0.5f, (float)i / m - 0.5f, a};
+                // vertex = {(float)i / m - 0.5f, (float)j / n - 0.5f, a};
             }
             vertices.push_back(vertex);
             normals.push_back(normal);
         }
     }
 
-    for (int i = 0; i < m; i++)
+    for (int j = 0; j < n; j++)
     {
-        for (int j = 0; j < n; j++)
+        for (int i = 0; i < m; i++)
         {
-            int idx1 = startIdx + i * (n + 1) + j;
+            int idx1 = startIdx + j * (m + 1) + i;
             int idx2 = idx1 + 1;
-            int idx3 = idx1 + (n + 1);
+            int idx3 = idx1 + (m + 1);
             int idx4 = idx3 + 1;
             if (((k < 0) && (axis == 2)) || ((k > 0) && (axis != 2)))
                 faces.push_back({idx1, idx2, idx4, idx3});

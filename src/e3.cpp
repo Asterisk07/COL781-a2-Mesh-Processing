@@ -18,10 +18,16 @@ int main()
     suppressStdout();
 
     const std::string filename = "meshes/try_new.obj";
+    // const std::string filename = "meshes/bunny_1k.obj";
+    // const std::string filename = "meshes/cube.obj";
+    // const std::string filename = "meshes/spot_control_mesh.obj";
 
-    // generateGrid(3, 3, filename);
-    generateSphere(7, 9, filename);
+    // generateSphere(7, 9, filename);
+    generateGrid(6, 4, filename);
     // generateCube(2, 3, 4, filename);
+
+    // generateSphere(4, 2, filename);
+    // generateGrid(1, 1, filename);
     // generateCube(3, 3, 3, filename);
     // generateCube(3, 3, 3, filename);
     // generateCube(4, 2, 5, filename);
@@ -52,7 +58,7 @@ int main()
     }
 
     // Set mesh data
-    // mesh.debugInfo();
+    mesh.debugInfo(triangleVertices, edges);
     v.setMesh(mesh.vertexPos.size(), triangleVertices.size(), edges.size(),
               mesh.vertexPos.data(), triangleVertices.data(), edges.data(), mesh.vertexNormal.data());
 
