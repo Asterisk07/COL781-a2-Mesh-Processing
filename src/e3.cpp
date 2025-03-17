@@ -9,27 +9,7 @@ using ivec3 = IVec3;
 int main()
 {
 
-    // Define a single triangle
-    // IVec3 faces[] = {
-    //     {0, 1, 2}};
-
-    // // Define vertex positions
-    // Vec3 vertices[] = {
-    //     Vec3(-0.5f, -0.5f, 0.0f), // v0
-    //     Vec3(0.5f, -0.5f, 0.0f),  // v1
-    //     Vec3(0.0f, 0.5f, 0.0f)    // v2
-    // };
-
-    // Vec3 normals[] = {
-    //     Vec3(0.0, 0.0, -1.0),
-    //     Vec3(0.0, 0.0, -1.0),
-    //     Vec3(0.0, 0.0, -1.0),
-    // };
-
-    /* ------------------------------------ ------------------------------------*/
-
     Vec3List vertices;
-    Vec2List texCoords;
     Vec3List normals;
     FaceList faces;
 
@@ -38,21 +18,15 @@ int main()
     suppressStdout();
 
     const std::string filename = "meshes/try_new.obj";
-    // const std::string filename = "meshes/spot_control_mesh.obj";
-    // const std::string filename = "meshes/bunny_1k.obj";
 
     // generateGrid(3, 3, filename);
     // generateSphere(7, 9, filename);
     // generateCube(2, 3, 4, filename);
     // generateCube(3, 3, 3, filename);
-    generateCube(3, 3, 3, filename);
+    // generateCube(3, 3, 3, filename);
     // generateCube(4, 2, 5, filename);
     // generateCube(1, 1, 1, filename);
-    mesh.loadObjfile(filename, vertices, texCoords, normals, faces);
-
-    // // set Attribs
-    // mesh.vertexPos = vertices;
-    // mesh.vertexNormal = normals;
+    mesh.loadObjfile(filename, vertices, normals, faces);
 
     // Build half-edge structure
     mesh.buildHalfEdgeStructure(faces);

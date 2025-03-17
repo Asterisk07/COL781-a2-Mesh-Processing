@@ -9,27 +9,7 @@ using ivec3 = IVec3;
 int main()
 {
 
-    // Define a single triangle
-    // IVec3 faces[] = {
-    //     {0, 1, 2}};
-
-    // // Define vertex positions
-    // Vec3 vertices[] = {
-    //     Vec3(-0.5f, -0.5f, 0.0f), // v0
-    //     Vec3(0.5f, -0.5f, 0.0f),  // v1
-    //     Vec3(0.0f, 0.5f, 0.0f)    // v2
-    // };
-
-    // Vec3 normals[] = {
-    //     Vec3(0.0, 0.0, -1.0),
-    //     Vec3(0.0, 0.0, -1.0),
-    //     Vec3(0.0, 0.0, -1.0),
-    // };
-
-    /* ------------------------------------ ------------------------------------*/
-
-    Vec3List vertices;
-    Vec2List texCoords;
+        Vec3List vertices;
     Vec3List normals;
     FaceList faces;
 
@@ -53,7 +33,7 @@ int main()
     generateCube(10, 10, 10, filename);
     // generateCube(4, 2, 5, filename);
     // generateCube(1, 1, 1, filename);
-    mesh.loadObjfile(filename, vertices, texCoords, normals, faces);
+    mesh.loadObjfile(filename, vertices, normals, faces);
 
     // // set Attribs
     // mesh.vertexPos = vertices;
@@ -76,8 +56,7 @@ int main()
     EdgeList edges;             // Explicit triangle edges for rendering
     mesh.triangulateMesh(triangleVertices, edges);
     std::cerr << "Here 2\n";
-    // restoreStdout();
-    // mesh.smoothen(0.8, 4);
+
     // mesh.computeEdgeStats(edges);
     // mesh.smoothen_taubin(0.4, -0.2, 50);
     mesh.addNoise("gaussian", 0.03);

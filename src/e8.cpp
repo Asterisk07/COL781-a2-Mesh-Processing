@@ -29,7 +29,6 @@ int main()
     /* ------------------------------------ ------------------------------------*/
 
     Vec3List vertices;
-    Vec2List texCoords;
     Vec3List normals;
     FaceList faces;
 
@@ -61,7 +60,7 @@ int main()
     // generateCube(1, 3, 1, filename);
     // generateCube(4, 2, 5, filename);
     // generateCube(1, 1, 1, filename);
-    mesh.loadObjfile(filename, vertices, texCoords, normals, faces);
+    mesh.loadObjfile(filename, vertices, normals, faces);
 
     // // set Attribs
     // mesh.vertexPos = vertices;
@@ -95,32 +94,16 @@ int main()
     // mesh.smoothen_laplacian(-0.1, 10);
     // mesh.extrudeVertex(0);
     // mesh.extrudeVertex(V - 1, 1);
-    if (true)
 
-    {
-
-        std::cerr << "Here 0" << std::endl;
-        mesh.smoothen_laplacian(-0.2, 15);
-        mesh.extrudeVertex(V - 1, -0.25);
-        mesh.extrudeVertex(0, 0.4);
-        std::cerr << "Here 1\n";
-
-        mesh.extrudeNeighbors(0, 0.4);
-        std::cerr << "Here 2\n";
-
-        mesh.flatten(V - 1);
-        std::cerr << "Here 3" << std::endl;
-
-        mesh.extrudeVertex(V - 1, 0.15);
-        std::cerr << "Here 4" << std::endl;
-
-        mesh.extrudeCopyNeighbors(V - 1, 0.15);
-    }
-    std::cerr << "Here 5" << std::endl;
+    mesh.smoothen_laplacian(-0.2, 15);
+    mesh.extrudeVertex(V - 1, -0.25);
+    mesh.extrudeVertex(0, 0.4);
+    mesh.extrudeNeighbors(0, 0.4);
+    mesh.flatten(V - 1);
+    mesh.extrudeVertex(V - 1, 0.15);
+    mesh.extrudeCopyNeighbors(V - 1, 0.15);
     mesh.triangulateMesh(triangleVertices, edges);
-    std::cerr << "Here 6" << std::endl;
     mesh.smoothen_laplacian(0.2, 3, V / 2);
-    std::cerr << "Here 7" << std::endl;
     mesh.extrudeVertex(0, 0.1);
 
     // mesh.computeVertexNormals();

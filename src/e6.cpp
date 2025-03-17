@@ -29,7 +29,6 @@ int main()
     /* ------------------------------------ ------------------------------------*/
 
     Vec3List vertices;
-    Vec2List texCoords;
     Vec3List normals;
     FaceList faces;
 
@@ -53,11 +52,7 @@ int main()
     generateCube(3, 3, 3, filename);
     // generateCube(4, 2, 5, filename);
     // generateCube(1, 1, 1, filename);
-    mesh.loadObjfile(filename, vertices, texCoords, normals, faces);
-
-    // // set Attribs
-    // mesh.vertexPos = vertices;
-    // mesh.vertexNormal = normals;
+    mesh.loadObjfile(filename, vertices, normals, faces);
 
     // Build half-edge structure
     mesh.buildHalfEdgeStructure(faces);
