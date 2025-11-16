@@ -1,4 +1,4 @@
-# COL781 Assignment 2: Mesh Processing
+# COL781 Computer Graphics Assignment 2: Mesh Processing
 
 ### This top I modelled , along with the reference image:
 
